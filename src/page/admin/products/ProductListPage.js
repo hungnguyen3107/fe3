@@ -3,60 +3,48 @@ import { productServices } from '../../../services/productService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
+import { Pagination } from 'antd';
 import { NavLink } from "react-router-dom";
 import { useProductContext } from '../../../services/helpers/getDataHelpers';
-import { Popconfirm } from "antd";
+import { Popconfirm, message } from "antd";
 const ProductListPage = () => {
-    const { product, handleOnclickId, handleDeleteProduct } = useProductContext();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(8);
+    const [product, setProduct] = useState([]);
+    const [search, setSearch] = useState("");
+    const [totalCount, setTotalCount] = useState(0);
+    const { handleOnclickId } = useProductContext();
+    const getProduct = async () => {
+        try {
+            const res = await productServices.get({
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage,
+                "Name": search
+            });
+            if (res) {
+                setProduct(res.items);
+                setTotalCount(res.totalCount);
+            }
 
-    // const columns = [
-    //     {
-    //       title: "Ảnh",
-    //       key: "image",
-    //       dataIndex: "image",
-    //       render: (text) => (
-    //         <>
-    //           <Avatar.Group>
-    //             <Avatar
-    //               className="shape-avatar"
-    //               shape="square"
-    //               size={40}
-    //               src={`https://localhost:7285/Images/${text[0]}`}
-    //             ></Avatar>
-    //           </Avatar.Group>{" "}
-    //         </>
-    //       )
-    //     },
-    //     {
-    //       title: "Tên sản phẩm",
-    //       dataIndex: "name",
-    //       key: "name",
-    //       width: "32%",
-    //     },
-    //     {
-    //         title: "Giá",
-    //         dataIndex: "price",
-    //         key: "price",
-    //         width: "32%",
-    //       },
-    //       {
-    //         title: "Số lượng",
-    //         dataIndex: "quantity",
-    //         key: "quantity",
-    //         width: "32%",
-    //       },
-    //     {
-    //       title: 'Thao tác',
-    //       width: '108px',
-    //       render: (record, index) => <div style={{ display: 'flex', justifyContent: 'space-around', paddingRight: '20px', paddingLeft: '20px' }}>
-
-    //         <EditOutlined onClick={() => showModalEdit(record)} style={{ marginRight: '1rem', color: '#036CBF', cursor: 'pointer' }} />
-    //         <Popconfirm onConfirm={() => handleDelete(record.id)} title="Bạn chắc chắn xóa?" cancelText='Hủy' okText='Đồng ý'>
-    //           <DeleteOutlined style={{ color: 'red', cursor: 'point' }} />
-    //         </Popconfirm>
-    //       </div>
-    //     }
-    //   ];
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    const handleDeleteProduct = async (id) => {
+        try {
+            const res = await productServices.deleteProduct({ Id: id });
+            if (res) {
+                getProduct()
+            } else {
+                message.error('xóa thất bại')
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        getProduct();
+    }, [currentPage, rowsPerPage, search])
     return (
         <div class="page-body">
             <div class="container-fluid">
@@ -90,7 +78,18 @@ const ProductListPage = () => {
                             <div class="card-header">
                                 <form class="form-inline search-form search-box">
                                     <div class="form-group">
-                                        <input class="form-control-plaintext" type="search" placeholder="Search.." />
+                                        <input class="form-control-plaintext"
+                                            type="text"
+                                            placeholder="Search.."
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === "Enter") {
+                                                    setSearch(e.target?.value)
+                                                    setCurrentPage(1)
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </form>
                                 <NavLink to="/AddProduct" class="btn btn-primary mt-md-0 mt-2"
@@ -143,22 +142,41 @@ const ProductListPage = () => {
 
                                                         <td data-field="name">{items.quantity}</td>
 
-                                                        <td>
-                                                            <a href="javascript:void(0)">
-                                                                <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} onClick={() => handleOnclickId(items.id)} />
-                                                            </a>
-
-                                                            <a href="javascript:void(0)">
-                                                                <Popconfirm onConfirm={() => handleDeleteProduct(items.id)} title="Bạn chắc chắn xóa?" cancelText='Hủy' okText='Đồng ý'>
-                                                                    <FontAwesomeIcon icon={faTrash} />
-                                                                </Popconfirm>
-                                                            </a>
+                                                        <td >
+                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} onClick={() => handleOnclickId(items.id)} />
+                                                            <Popconfirm
+                                                                title="Xóa sản phẩm này?"
+                                                                onConfirm={() => handleDeleteProduct(items.id)}
+                                                                okText="Yes"
+                                                                cancelText="No"
+                                                            >
+                                                                <FontAwesomeIcon icon={faTrash} />
+                                                            </Popconfirm>
+                                                            {/* <FontAwesomeIcon icon={faTrash} onClick={handleTrashIconClick(items.id)} /> */}
                                                         </td>
+
                                                     </tr>
+
                                                 ))
                                             }
                                         </tbody>
                                     </table>
+
+                                    <Pagination
+                                        current={currentPage}
+                                        pageSize={rowsPerPage}
+                                        defaultPageSize={rowsPerPage}
+                                        showSizeChanger={true}
+                                        pageSizeOptions={["10", "20", "30", '100']}
+                                        total={totalCount}
+                                        locale={{ items_per_page: "/ trang" }}
+                                        showTotal={(total, range) => <span>Tổng số: {total}</span>}
+                                        onShowSizeChange={(current, pageSize) => {
+                                            setCurrentPage(current);
+                                            setRowsPerpage(pageSize);
+                                        }}
+                                        onChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                    />
                                 </div>
                             </div>
                         </div>

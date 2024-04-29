@@ -5,6 +5,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { useProductContext } from '../../../services/helpers/getDataHelpers';
 import { productServices } from '../../../services/productService';
+import ProductModal from './modal/ProductModal';
 import { useParams } from 'react-router-dom';
 const { Option } = Select;
 const getBase64 = (file) =>
@@ -21,11 +22,17 @@ const AddProductPage = () => {
     const [isStatus, setIsStatus] = useState(0);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const { supplier, category } = useProductContext();
+    const { supplier, category, getProduct } = useProductContext();
     const [dataProductDetail, setDataProductDetail] = useState([0]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(8);
     const getDataProductDetail = async () => {
         try {
-            const res = await productServices.get({ Id: id });
+            const res = await productServices.get({
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage,
+                "Id": id
+            });
             setDataProductDetail(res.items);
 
         } catch (error) {
@@ -85,18 +92,19 @@ const AddProductPage = () => {
 
     }, [id]);
     useEffect(() => {
+        console.log("dataProductDetail:", dataProductDetail[0]);
         if (id && dataProductDetail && dataProductDetail.length > 0) {
             const productDetail = dataProductDetail[0];
             form.setFieldsValue({
-                Name: productDetail?.name ? productDetail?.name : "",
-                Price: productDetail?.price ? productDetail?.price : "",
-                PromotionPrice: productDetail?.promotionPrice ? productDetail?.promotionPrice : "",
-                Description: productDetail?.description ? productDetail?.description : "",
-                IsStatus: productDetail?.isStatus ? productDetail?.isStatus : "",
-                Quantity: productDetail?.quantity ? productDetail?.quantity : "",
-                Image: productDetail?.image ? productDetail?.image : "",
-                'Category.Id': productDetail.category?.id ? productDetail.category?.id : "",
-                'Supplier.Id': productDetail.supplier?.id ? productDetail.supplier?.id : ""
+                Name: productDetail?.name !== null ? productDetail?.name : "",
+                Price: productDetail?.price !== null ? productDetail?.price : "",
+                PromotionPrice: productDetail?.promotionPrice !== null ? productDetail?.promotionPrice : "",
+                Description: productDetail?.description !== null ? productDetail?.description : "",
+                IsStatus: productDetail?.isStatus !== null ? productDetail?.isStatus : "",
+                Quantity: productDetail?.quantity !== null ? productDetail?.quantity : "",
+                Image: productDetail?.image !== null ? productDetail?.image : "",
+                'Category.Id': productDetail?.category?.id !== null ? productDetail?.category?.id : "",
+                'Supplier.Id': productDetail?.supplier?.id !== null ? productDetail?.supplier?.id : ""
             });
         } else {
             form.setFieldsValue({
@@ -115,13 +123,17 @@ const AddProductPage = () => {
         if (id && dataProductDetail && dataProductDetail.length > 0) {
             try {
                 const formData = new FormData();
-                console.log(values)
-                if (fileList) {
+                console.log("data", values)
+                if (fileList && fileList.length > 0) {
                     fileList.forEach(file => {
                         const fileObj = file.originFileObj;
-                        formData.append(`ImageFiles`, fileObj);
-                        console.log(fileObj);
+                        formData.append('ImageFiles', fileObj);
                     });
+                } else {
+                    // Sử dụng ảnh cũ nếu không có ảnh mới và dataProductDetail không null và có ít nhất một phần tử
+                    if (dataProductDetail[0] && dataProductDetail[0].image) {
+                        formData.append('ImageFiles', dataProductDetail[0].image);
+                    }
                 }
                 formData.append("Name", values.Name);
                 formData.append("Price", values.Price);
@@ -132,10 +144,10 @@ const AddProductPage = () => {
                 formData.append("Supplier.Id", values["Supplier.Id"]);
                 formData.append("Description", descriptionCkData);
                 const response = await productServices.updateProduct(id, formData);
-                // console.log(response);
-                message.success("Chỉnh sửa thành thông");
-                form.resetFields();
-                setFileList([]);
+                if (response) {
+                    getProduct();
+                    message.success("Chỉnh sửa thành thông");
+                }
             } catch (error) {
                 console.error(error);
                 message.error("Chỉnh sửa thất bại");
@@ -160,8 +172,10 @@ const AddProductPage = () => {
                 formData.append("Supplier.Id", values["Supplier.Id"]);
                 formData.append("Description", descriptionCkData);
                 const response = await productServices.create(formData);
-                // console.log(response);
-                message.success("Thêm mới thành công");
+                if (response) {
+                    getProduct();
+                    message.success("Thêm mới thành công");
+                }
                 form.resetFields();
                 setFileList([]);
             } catch (error) {
@@ -348,6 +362,7 @@ const AddProductPage = () => {
                             <div class="card">
                                 <div class="card-header">
                                     <h5>Meta Data</h5>
+                                    <ProductModal />
                                 </div>
                                 <div class="card-body">
                                     <div class="digital-add needs-validation">

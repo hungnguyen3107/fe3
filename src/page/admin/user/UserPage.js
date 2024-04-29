@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Select, Input, Modal, Upload, Button, Tabs, message, Space } from "antd";
 import { LockOutlined, MailOutlined, PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { userServices } from '../../../services/userService';
+import { useParams } from 'react-router-dom';
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -19,8 +20,40 @@ const UserPage = () => {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [previewOpen, setPreviewOpen] = useState(false);
-    const [selectedValues, setSelectedValues] = useState('Nhân viên');
+    const [selectedValues, setSelectedValues] = useState("");
     const [fileList, setFileList] = useState(null);
+    const [dataUserDetail, setDataUserDetail] = useState([])
+    const { id } = useParams()
+    //hiển thị thông tin người dùng
+    const getUserDetail = async () => {
+        try {
+            const res = await userServices.get({ Id: id });
+            setDataUserDetail(res.items);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        getUserDetail();
+        if (dataUserDetail[0]) {
+            setSelectedValues(dataUserDetail[0].roles);
+        }
+    }, [id])
+    useEffect(() => {
+        // console.log("dataUserDetail:", dataUserDetail[0]);
+        if (id && dataUserDetail[0]) {
+            const userDetail = dataUserDetail[0];
+            form.setFieldsValue({
+                LastName: userDetail?.lastName !== null ? userDetail?.lastName : "",
+                FirstName: userDetail?.firstName !== null ? userDetail?.firstName : "",
+                Email: userDetail?.email !== null ? userDetail?.email : "",
+                Password: userDetail?.password !== null ? userDetail?.password : "",
+                PhoneNumber: userDetail?.phoneNumber !== null ? userDetail?.phoneNumber : "",
+                Role: userDetail?.roles && userDetail.roles.length > 0 ? userDetail.roles : "",
+                Image: userDetail?.avatar !== null ? userDetail?.avatar : "",
+            });
+        }
+    }, [dataUserDetail, form]);
     const handleCancel = () => setPreviewOpen(false);
     const handleChangeRole = (selectedOptions) => {
         const selectedValues = selectedOptions.map(option => option.value);
@@ -69,30 +102,56 @@ const UserPage = () => {
         </button>
     );
     const onFinish = async (values) => {
-        try {
-            const formData = new FormData();
-            console.log(values)
-            if (fileList) {
-                const fileObj = fileList.originFileObj;
-                formData.append(`ImageFile`, fileObj);
-                console.log(fileObj)
+        if (id && dataUserDetail[0]) {
+            try {
+                const formData = new FormData();
+                console.log("data", values)
+                if (fileList) {
+                    const fileObj = fileList.originFileObj;
+                    formData.append(`ImageFile`, fileObj);
+                    console.log(fileObj)
+                }
+                formData.append("LastName", values.LastName);
+                formData.append("FirstName", values.FirstName);
+                formData.append("Email", values.Email);
+                formData.append("Password", values.Password);
+                formData.append("PhoneNumber", values.PhoneNumber);
+                formData.append("Role", values.Role);
+                const response = await userServices.updatUser(id, formData);
+                if (response) {
+                    message.success("chỉnh sửa thành công");
+                }
+            } catch (error) {
+                console.error(error);
+                message.error("chỉnh sửa thất bại");
             }
-            formData.append("LastName", values.LastName);
-            formData.append("FirstName", values.FirstName);
-            formData.append("Email", values.Email);
-            formData.append("Password", values.Password);
-            formData.append("PhoneNumber", values.PhoneNumber);
-            formData.append("Role", values.Role);
-            const response = await userServices.create(formData);
-            // console.log(response);
-            message.success("Thêm mới thành công");
-            form.resetFields();
-            setFileList([]);
-        } catch (error) {
-            console.error(error);
-            message.error("thêm mới thất bại");
+        } else {
+            try {
+                const formData = new FormData();
+                console.log("Data", values)
+                if (fileList) {
+                    const fileObj = fileList.originFileObj;
+                    formData.append(`ImageFile`, fileObj);
+                    console.log(fileObj)
+                }
+                formData.append("LastName", values.LastName);
+                formData.append("FirstName", values.FirstName);
+                formData.append("Email", values.Email);
+                formData.append("Password", values.Password);
+                formData.append("PhoneNumber", values.PhoneNumber);
+                formData.append("Role", values.Role);
+                const response = await userServices.create(formData);
+                // console.log(response);
+                message.success("Thêm mới thành công");
+                form.resetFields();
+                setFileList([]);
+            } catch (error) {
+                console.error(error);
+                message.error("thêm mới thất bại");
+            }
         }
     }
+
     return (
         <div class="page-body">
             <div class="container-fluid">
@@ -228,12 +287,12 @@ const UserPage = () => {
                                                                 /> */}
                                                                 <Form.Item
                                                                     style={{ marginBottom: "4px" }}
-
+                                                                    // label={"Số lượng"}
                                                                     name="Email"
                                                                     rules={[
                                                                         {
                                                                             required: true,
-                                                                            message: " Email",
+                                                                            message: "Nhập Email",
                                                                         }
                                                                     ]}
                                                                 >
@@ -321,6 +380,7 @@ const UserPage = () => {
                                                                         mode="multiple"
                                                                         style={{ width: '100%' }}
                                                                         placeholder="Chọn vai trò"
+                                                                        value={selectedValues}
                                                                         onChange={handleChangeRole}
                                                                         options={options}
                                                                         optionRender={(option) => (

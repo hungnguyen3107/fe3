@@ -1,16 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { Popconfirm } from "antd";
+import { Popconfirm, message } from "antd";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
 import { userServices } from '../../../services/userService';
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const UserListPage = () => {
     const [user, setUser] = useState([]);
+    const navigate = useNavigate()
+    //lấy dữ liệu người dùng
     const getUser = async () => {
         try {
             const res = await userServices.get();
             setUser(res.items);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //chuyển đến trang chi tiết
+    const handleOnclickUserId = async (id) => {
+        try {
+            navigate(`EdirUser/${id}`)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //xóa người dùng dùng
+    const DeleteUser = async (id) => {
+        try {
+            const res = await userServices.deleteUser({ Id: id });
+            if (res) {
+                getUser();
+            } else {
+                message.error('xóa thất bại')
+            }
         } catch (error) {
             console.error(error);
         }
@@ -106,11 +130,10 @@ const UserListPage = () => {
                                                 <td>{items.roles}</td>
                                                 <td>
                                                     <a href="javascript:void(0)">
-                                                        <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} />
+                                                        <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} onClick={() => handleOnclickUserId(items.id)} />
                                                     </a>
-
-                                                    <a href="javascript:void(0)">
-                                                        <Popconfirm title="Bạn chắc chắn xóa?" cancelText='Hủy' okText='Đồng ý'>
+                                                    <a >
+                                                        <Popconfirm onConfirm={() => DeleteUser(items.id)} title="Xóa sản phẩm này?" cancelText='Hủy' okText='Đồng ý'>
                                                             <FontAwesomeIcon icon={faTrash} />
                                                         </Popconfirm>
                                                     </a>

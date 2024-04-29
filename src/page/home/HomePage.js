@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import '../../css/demo3.min.css'
-import "../../css/stickyicon.css"
 import "../../css/amimate.min.css"
 import "../../css/all.min.css"
 import { Carousel } from 'antd';
@@ -12,8 +11,17 @@ import banner1 from "../../images/demos/demo3/banners/1.jpg"
 import banner2 from "../../images/demos/demo3/banners/2.jpg"
 import banner3 from "../../images/demos/demo3/banner2.jpg"
 import { useProductContext } from '../../services/helpers/getDataHelpers'
+import { useNavigate } from "react-router-dom";
 const HomePage = () => {
-    const { product, handleClickDetail, categoryParent, handleOnclickCategoryParent } = useProductContext();
+    const { product, handleClickDetail, categoryParent } = useProductContext();
+    const navigate = useNavigate()
+    const handleOnclickCategoryParent = async (id) => {
+        try {
+            navigate(`shop/${id}`)
+        } catch (error) {
+            console.error(error);
+        }
+    }
     return (
         <>
             <main class="main mt-lg-4">
@@ -28,10 +36,10 @@ const HomePage = () => {
                                 <div class="sidebar-content">
                                     <div class="sticky-sidebar">
                                         <ul class="menu vertical-menu category-menu mb-4">
-                                            <li><a href="demo3-shop.html" class="menu-title">Popular Categories</a></li>
+                                            <li ><a href="demo3-shop.html" class="menu-title">Popular Categories</a></li>
                                             {
                                                 categoryParent.map((items, index) => (
-                                                    <li key={index}> <a onClick={() => handleOnclickCategoryParent(items.id)}>{items.name}</a></li>
+                                                    <li key={index} style={{ width: "100%" }}> <a onClick={() => handleOnclickCategoryParent(items.id)}>{items.name}</a></li>
                                                 ))
                                             }
                                         </ul>

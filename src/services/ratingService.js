@@ -1,10 +1,10 @@
 import createApiService from '../createApiService'
 const api = createApiService();
-const get = () => {
+const get = (params) => {
     return api.makeAuthRequest({
         url: `/api/Rating`,
         method: "GET",
-        // params: params
+        params: params
     });
 };
 const create = (data) => {
@@ -14,7 +14,15 @@ const create = (data) => {
         data: data,
     });
 };
+const deleteRating = (params) => {
+    return api.makeAuthRequest({
+        url: `/api/Rating`,
+        method: "DELETE",
+        params: params
+    });
+};
 export const ratingServices = {
     get,
     create,
+    deleteRating
 };

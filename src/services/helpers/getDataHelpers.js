@@ -20,14 +20,14 @@ export const ProductProvider = ({ children }) => {
     const [ward, setWard] = useState([]);
     const [product, setProduct] = useState([]);
     const [order, setOrder] = useState([]);
-    const [dataRating, setDataRating] = useState([]);
     const [productId, setProductId] = useState();
     const [changeCount, setChangeCount] = useState(0);
     const [isChangeStatus, setIsChangeStatus] = useState(2)
-    // const [orderId, setOrderId] = useState([]);
-    // const [categoryParentId, setCategoryParentId] = useState([]);
     const [categoryParent, setCategoryParent] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(8);
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -49,7 +49,6 @@ export const ProductProvider = ({ children }) => {
                 }
             } catch (error) {
                 console.error("Error:", error);
-                // Xử lý lỗi ở đây nếu cần thiết
             }
         }
     };
@@ -58,15 +57,6 @@ export const ProductProvider = ({ children }) => {
         try {
             const res = await productCategoryParentServices.get();
             setCategoryParent(res.items);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    //lấy dữ liệu đánh giá sao
-    const getRating = async () => {
-        try {
-            const res = await ratingServices.get();
-            setDataRating(res.items);
         } catch (error) {
             console.error(error);
         }
@@ -83,8 +73,15 @@ export const ProductProvider = ({ children }) => {
     //lấy dữ liệu sản phẩm
     const getProduct = async () => {
         try {
-            const res = await productServices.get();
-            setProduct(res.items);
+            const res = await productServices.get({
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage
+            });
+            if (res) {
+                setProduct(res.items);
+                setTotalCount(res.totalCount);
+            }
+
         } catch (error) {
             console.error(error);
         }
@@ -101,46 +98,26 @@ export const ProductProvider = ({ children }) => {
     //xem chi tiết
     const handleClickDetail = async (id) => {
         try {
-            const res = await productServices.get({ Id: id });
-            setProductId(res.items);
+            // const res = await productServices.get({ Id: id });
+            // setProductId(res.items);
             navigate(`Detail/${id}`)
         } catch (error) {
             console.error(error);
         }
     }
-    //xem trang shopPage
-    // const handleOnclickCategoryParent = async (id) => {
-    //     try {
-    //         const res = await productServices.get({ CategoryParent_id: id });
-    //         setCategoryParentId(res.items);
-    //         navigate(`shop/${id}`)
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-    //xem chi tiết order
-    // const handleClickDetailOrder = async (id) => {
-    //     try {
-    //         const res = await orderServices.get({ Id: id });
-    //         setOrderId(res.items);
-    //         navigate(`OrderDetail/${id}`)
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
     //xóa sản phẩm
-    const handleDeleteProduct = async (id) => {
-        try {
-            const res = await productServices.deleteProduct({ Id: id });
-            if (res) {
-                getProduct()
-            } else {
-                message.error('xóa thất bại')
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    // const handleDeleteProduct = async (id) => {
+    //     try {
+    //         const res = await productServices.deleteProduct({ Id: id });
+    //         if (res) {
+    //             getProduct()
+    //         } else {
+    //             message.error('xóa thất bại')
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }
     //lấy dữ liệu nhà cung cấp 
     const getSupplier = async () => {
         try {
@@ -195,11 +172,10 @@ export const ProductProvider = ({ children }) => {
         getWard();
         getProduct();
         getOrder();
-        getRating();
         getProductCategory();
     }, [isChangeStatus]);
     return (
-        <ProductContext.Provider value={{ categoryParent, dataRating, isModalOpen, order, category, supplier, province, district, ward, product, productId, handleOnclickId, getSupplier, getCategory, handleDeleteProduct, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus }}>
+        <ProductContext.Provider value={{ productId, totalCount, categoryParent, isModalOpen, order, category, supplier, province, district, ward, product, handleOnclickId, getSupplier, getCategory, getProductCategory, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus, getProduct }}>
             {children}
         </ProductContext.Provider>
     );

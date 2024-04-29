@@ -1,10 +1,10 @@
 import createApiService from '../createApiService'
 const api = createApiService();
-const get = () => {
+const get = (params) => {
     return api.makeAuthRequest({
         url: `/api/User`,
         method: "GET",
-        // params: params
+        params: params
     });
 };
 const create = (data) => {
@@ -14,6 +14,13 @@ const create = (data) => {
         data: data,
     });
 };
+const updatUser = (Id, data) => {
+    return api.makeAuthRequest({
+        url: `/api/User?Id=${Id}`,
+        method: "PUT",
+        data: data
+    });
+};
 const login = (data) => {
     return api.makeAuthRequest({
         url: "/api/User/login",
@@ -21,8 +28,17 @@ const login = (data) => {
         data: data,
     })
 }
+const deleteUser = (params) => {
+    return api.makeAuthRequest({
+        url: `/api/User`,
+        method: "DELETE",
+        params: params
+    });
+};
 export const userServices = {
     get,
     create,
-    login
+    login,
+    updatUser,
+    deleteUser
 };

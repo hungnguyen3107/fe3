@@ -15,26 +15,65 @@ import { message, Tabs } from 'antd';
 import { NavLink } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import LoginPage from '../login/LoginPage';
-import DoubleRangeSlider from './component/FilterComponent';
 import icon from "../../images/icon.png"
+import { productServices } from '../../services/productService';
 import { Modal } from 'antd';
 const ProductDetailPage = () => {
     const { TabPane } = Tabs;
-    const { productId, isModalOpen, handleOk, handleCancel, showModal, dataRating } = useProductContext();
+    const { isModalOpen, handleOk, handleCancel, showModal } = useProductContext();
     const { isDataCart, setDataCart, dataUser } = useCartContext();
     const [isRating, setIsRating] = useState(false);
+    const [productId, setProductId] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
+    const [dataRating, setDataRating] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(8);
     const { id } = useParams();
     const handleRatingClick = (value) => {
         setRating(value);
     };
-
     const handleCommentChange = (event) => {
         setComment(event.target.value);
     };
+    // const getProductDetail = async () => {
+    //     try {
+    //         const res = await productServices.get({
+    //             Id: id,
+    //             Limit: currentPage,
+    //             PageIndex: rowsPerPage,
+    //         });
+    //         setProductId(res.items);
+    //         console.log("productdetail", productId)
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }
+    const getProductDetail = async () => {
+        try {
+            const res = await productServices.get({
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage,
+                "Id": id
+            });
+            if (res) {
+                setProductId(res.items);
+            }
 
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //lấy dữ liệu đánh giá sao
+    const getRating = async () => {
+        try {
+            const res = await ratingServices.get({ "Product_id": id });
+            setDataRating(res.items);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     const handleSubmit = (event) => {
         event.preventDefault();
         const res = ratingServices.create({ "star": rating, "content": comment, "product_id": id, "user_id": dataUser.id })
@@ -85,6 +124,10 @@ const ProductDetailPage = () => {
             }
         }
     };
+    useEffect(() => {
+        getRating();
+        getProductDetail()
+    }, [])
     useEffect(() => {
         JSON.parse(sessionStorage.getItem('products'))
     }, [isDataCart])

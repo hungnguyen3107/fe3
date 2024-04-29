@@ -18,8 +18,10 @@ import DashboardPage from './page/profile/DashboardPage';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProductProvider } from './services/helpers/getDataHelpers';
 import { CartProvider } from './services/helpers/getDataCartHelper';
+import ProductReviewPage from './page/admin/products/ProductReviewPage';
 import UserListPage from './page/admin/user/UserListPage';
 import UserPage from './page/admin/user/UserPage';
+import ProfileAdminPage from './page/admin/user/ProfileAdminPage';
 
 function App() {
   // const { roles } = useCartContext() || {};
@@ -39,9 +41,12 @@ function App() {
                   <Route path="/AddProduct" element={<AddProductPage />} />
                   <Route path="/EdirProduct/:id" element={<AddProductPage />} />
                   <Route path="/User" element={<UserPage />} />
+                  <Route path="UserList/EdirUser/:id" element={<UserPage />} />
                   <Route path="/UserList" element={<UserListPage />} />
                   <Route path="/OrderList" element={<OrderListPage />} />
+                  <Route path="/Profile" element={<ProfileAdminPage />} />
                   <Route path="/OrderList/:id" element={<OrderDetailPage />} />
+                  <Route path="/ProductReview" element={<ProductReviewPage />} />
                 </Route>
               ) : (
                 <Route path="/" element={<UserLayout />}>

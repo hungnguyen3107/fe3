@@ -6,22 +6,31 @@ import { useProductContext } from '../../services/helpers/getDataHelpers'
 import FilterComponent from './component/FilterComponent';
 import { productServices } from '../../services/productService';
 import { useParams } from 'react-router-dom';
+import { Pagination } from 'antd';
 import "../../css/checkbox.css"
 const ShopePage = () => {
     const { category, supplier } = useProductContext();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(9);
+    const [totalCount, setTotalCount] = useState(0);
     const [categoryParentId, setCategoryParentId] = useState([]);
     const { id } = useParams();
     const getCategoryParnt = async () => {
         try {
-            const res = await productServices.get({ CategoryParent_id: id });
+            const res = await productServices.get({
+                CategoryParent_id: id,
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage
+            });
             setCategoryParentId(res.items);
+            setTotalCount(res.totalCount);
         } catch (error) {
             console.error(error);
         }
     }
     useEffect(() => {
         getCategoryParnt();
-    }, []);
+    }, [currentPage, rowsPerPage]);
     return (
         <main class="main">
             <div class="page-content mb-10 pb-2">
@@ -130,11 +139,12 @@ const ShopePage = () => {
                                     </div>
                                 </div>
                             </nav>
-                            <div class="row cols-2 cols-sm-3 product-wrapper">
-                                <div class="product-wrap">
-                                    {
-                                        categoryParentId.map((items, index) => (
-                                            <div class="product text-center" key={index}>
+                            <div class="row cols-2 cols-sm-3 product-wrapper" >
+                                {
+                                    categoryParentId.map((items, index) => (
+
+                                        <div class="product-wrap" key={index}>
+                                            <div class="product text-center" >
                                                 <figure class="product-media">
                                                     <a href="demo3-product.html">
                                                         <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
@@ -171,12 +181,15 @@ const ShopePage = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))
-                                    }
-                                </div>
+                                        </div>
+
+                                    ))
+                                }
+
                             </div>
+
                             <nav class="toolbox toolbox-pagination">
-                                <p class="show-info">Showing <span>12 of 56</span> Products</p>
+                                {/* <p class="show-info">Showing <span>12 of 56</span> Products</p>
                                 <ul class="pagination">
                                     <li class="page-item disabled">
                                         <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
@@ -193,7 +206,22 @@ const ShopePage = () => {
                                             Next<i class="d-icon-arrow-right"></i>
                                         </a>
                                     </li>
-                                </ul>
+                                </ul> */}
+                                <Pagination
+                                    current={currentPage}
+                                    pageSize={rowsPerPage}
+                                    defaultPageSize={rowsPerPage}
+                                    showSizeChanger={true}
+                                    pageSizeOptions={["10", "20", "30", '100']}
+                                    total={totalCount}
+                                    locale={{ items_per_page: "/ trang" }}
+                                    showTotal={(total, range) => <span>Tổng số: {total}</span>}
+                                    onShowSizeChange={(current, pageSize) => {
+                                        setCurrentPage(current);
+                                        setRowsPerpage(pageSize);
+                                    }}
+                                    onChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                />
                             </nav>
                         </div>
                     </div>
