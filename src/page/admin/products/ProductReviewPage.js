@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
-import { Popconfirm } from "antd";
+import { Popconfirm, Pagination } from "antd";
 import { ratingServices } from '../../../services/ratingService';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 const ProductReviewPage = () => {
@@ -133,6 +133,21 @@ const ProductReviewPage = () => {
 
                                             </tbody>
                                         </table>
+                                        <Pagination
+                                            current={currentPage}
+                                            pageSize={rowsPerPage}
+                                            defaultPageSize={rowsPerPage}
+                                            showSizeChanger={true}
+                                            pageSizeOptions={["10", "20", "30", '100']}
+                                            total={totalCount}
+                                            locale={{ items_per_page: "/ trang" }}
+                                            showTotal={(total, range) => <span>Tổng số: {total}</span>}
+                                            onShowSizeChange={(current, pageSize) => {
+                                                setCurrentPage(current);
+                                                setRowsPerpage(pageSize);
+                                            }}
+                                            onChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                        />
                                     </div>
                                 </div>
                             </div>

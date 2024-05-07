@@ -7,6 +7,7 @@ import { productServices } from '../productService';
 import { WardServices } from '../wardService';
 import { orderServices } from '../orderService';
 import { ratingServices } from '../ratingService';
+import { postDetailBlog } from '../blogService';
 import { productCategoryParentServices } from '../productCategoryParentService';
 import { useNavigate } from "react-router-dom";
 import { message } from 'antd';
@@ -24,6 +25,7 @@ export const ProductProvider = ({ children }) => {
     const [changeCount, setChangeCount] = useState(0);
     const [isChangeStatus, setIsChangeStatus] = useState(2)
     const [categoryParent, setCategoryParent] = useState([]);
+    const [dataBlodDetail, setDataBlogDetail] = useState(null);
     const [totalCount, setTotalCount] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -38,6 +40,12 @@ export const ProductProvider = ({ children }) => {
         setIsModalOpen(false);
     };
     const navigate = useNavigate()
+    //xem chi tiết blog
+    const handleClickBlog = async (title) => {
+        const res = await postDetailBlog({ title: title }); // Gửi title như một object
+        setDataBlogDetail(res.data);
+        navigate(`/blogDetail`)
+    }
     //thay đổi trạng thái 
     const handleChangeStatus = async (id) => {
         if (changeCount < 3) {
@@ -86,6 +94,7 @@ export const ProductProvider = ({ children }) => {
             console.error(error);
         }
     }
+
     const handleOnclickId = async (id) => {
         try {
             const res = await productServices.get({ Id: id });
@@ -98,26 +107,11 @@ export const ProductProvider = ({ children }) => {
     //xem chi tiết
     const handleClickDetail = async (id) => {
         try {
-            // const res = await productServices.get({ Id: id });
-            // setProductId(res.items);
             navigate(`Detail/${id}`)
         } catch (error) {
             console.error(error);
         }
     }
-    //xóa sản phẩm
-    // const handleDeleteProduct = async (id) => {
-    //     try {
-    //         const res = await productServices.deleteProduct({ Id: id });
-    //         if (res) {
-    //             getProduct()
-    //         } else {
-    //             message.error('xóa thất bại')
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
     //lấy dữ liệu nhà cung cấp 
     const getSupplier = async () => {
         try {
@@ -175,7 +169,7 @@ export const ProductProvider = ({ children }) => {
         getProductCategory();
     }, [isChangeStatus]);
     return (
-        <ProductContext.Provider value={{ productId, totalCount, categoryParent, isModalOpen, order, category, supplier, province, district, ward, product, handleOnclickId, getSupplier, getCategory, getProductCategory, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus, getProduct }}>
+        <ProductContext.Provider value={{ dataBlodDetail, handleClickBlog, productId, totalCount, categoryParent, isModalOpen, order, category, supplier, province, district, ward, product, handleOnclickId, getSupplier, getCategory, getProductCategory, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus, getProduct }}>
             {children}
         </ProductContext.Provider>
     );

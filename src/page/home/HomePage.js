@@ -10,10 +10,24 @@ import slider3 from "../../images/demos/demo3/slides/3.jpg"
 import banner1 from "../../images/demos/demo3/banners/1.jpg"
 import banner2 from "../../images/demos/demo3/banners/2.jpg"
 import banner3 from "../../images/demos/demo3/banner2.jpg"
+import brand1 from "../../images/brands/1.png"
+import brand2 from "../../images/brands/2.png"
+import brand3 from "../../images/brands/3.png"
+import brand4 from "../../images/brands/4.png"
+import brand5 from "../../images/brands/5.png"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { useProductContext } from '../../services/helpers/getDataHelpers'
 import { useNavigate } from "react-router-dom";
+import { productServices } from '../../services/productService';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { useCartContext } from '../../services/helpers/getDataCartHelper';
 const HomePage = () => {
     const { product, handleClickDetail, categoryParent } = useProductContext();
+    const { handleAddToCart } = useCartContext();
+    const [saleProduct, setSaleProduct] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerpage] = useState(8);
     const navigate = useNavigate()
     const handleOnclickCategoryParent = async (id) => {
         try {
@@ -22,6 +36,26 @@ const HomePage = () => {
             console.error(error);
         }
     }
+    //lấy ra sản phẩm đã giảm giá
+    const getSaleProduct = async () => {
+        try {
+            const res = await productServices.get({
+                "IsStatus": 1,
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage
+            });
+            if (res) {
+                setSaleProduct(res.items);
+                console.log(res.items);
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        getSaleProduct();
+    }, [])
     return (
         <>
             <main class="main mt-lg-4">
@@ -424,13 +458,13 @@ const HomePage = () => {
                                     <h2 class="title title-line title-underline with-link appear-animate" data-animation-options="{
                                     'delay': '.3s'
                                 }" style={{ visibility: "visible", opacity: 1 }}>Featured Product
-                                        <a href="#" class="font-weight-semi-bold">View more<i class="d-icon-arrow-right"></i></a></h2>
+                                        <a href="#" class="font-weight-semi-bold">View more<FontAwesomeIcon style={{ marginLeft: "5px" }} icon={faArrowRight} /></a></h2>
                                     <div class="row gutter-xs appear-animate" data-animation-options="{
                                     'delay': '.3s'
                                 }" style={{ visibility: "visible", opacity: 1 }}>
                                         {
-                                            product.map((items, index) => (
-                                                <div class="col-md-3 col-6 mb-4" key={index} onClick={() => handleClickDetail(items.id)}>
+                                            product.slice(0, 8).map((items, index) => (
+                                                <div class="col-md-3 col-6 mb-4" key={index}>
                                                     <div class="product text-center">
                                                         <figure class="product-media">
                                                             <a style={{ cursor: "pointer" }}>
@@ -438,13 +472,18 @@ const HomePage = () => {
                                                             </a>
                                                             <div class="product-label-group">
                                                                 <label class="product-label label-new">new</label>
+                                                                {
+                                                                    items.isStatus == 1 ?
+                                                                        (<label class="product-label label-sale">Giảm giá</label>) :
+                                                                        ""
+                                                                }
                                                             </div>
                                                             <div class="product-action-vertical">
-                                                                <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                                                <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
+                                                                <a class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart" onClick={() => handleAddToCart(items.id)} ><FontAwesomeIcon icon={faCartPlus} /></a>
+
                                                             </div>
                                                             <div class="product-action">
-                                                                <a href="#" class="btn-product btn-quickview" title="Quick View" >Chi tiết</a>
+                                                                <a class="btn-product btn-quickview" title="Quick View" onClick={() => handleClickDetail(items.id)} style={{ cursor: "pointer" }}>Chi tiết</a>
                                                             </div>
                                                         </figure>
                                                         <div class="product-details">
@@ -454,27 +493,26 @@ const HomePage = () => {
                                                                 <a href="demo3-product.html">{items.name}</a>
                                                             </h3>
                                                             <div class="product-price">
-                                                                <span class="price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                <ins class="new-price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins>
+                                                                {
+                                                                    items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
+                                                                }
                                                             </div>
-                                                            <div class="ratings-container">
+                                                            {/* <div class="ratings-container">
                                                                 <div class="ratings-full">
                                                                     <span class="ratings" style={{ width: "60%" }}></span>
                                                                     <span class="tooltiptext tooltip-top"></span>
                                                                 </div>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))
                                         }
-
                                     </div>
                                 </section>
                                 <section class="banner banner-cta mb-7 text-center" style={{ backgroundImage: "url('images/demos/demo3/banner.jpg')", backgroundColor: "#c5d1d2" }}>
-                                    <div class="banner-content w-100 appear-animate" data-animation-options="{
-                                    'delay': '.2s',
-                                    'name': 'blurIn'
-                                }">
+                                    <div class="banner-content w-100 ">
                                         <h4 class="banner-subtitle font-weight-bold ls-s text-white text-uppercase">Coming
                                             soon</h4>
                                         <h2 class="banner-title font-weight-normal ls-m"><strong>Black Friday</strong>
@@ -490,85 +528,41 @@ const HomePage = () => {
                                 <section class="mb-3">
                                     <div class="row">
                                         <div class="col-md-4 col-sm-6 mb-4">
-                                            <div class="widget widget-products appear-animate" data-animation-options="{
-                                            'name': 'fadeInLeftShorter',
-                                            'delay': '.5s'
-                                        }">
+                                            <div class="widget widget-products ">
                                                 <h4 class="widget-title font-weight-bold">Sale Products</h4>
                                                 <div class="products-col">
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/9.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Women’s Beautiful
-                                                                    Headgear</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <span class="price">$78.24</span>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "40%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
+                                                    {
+                                                        saleProduct.map((items, index) => (
+                                                            <div class="product product-list-sm" key={index}>
+                                                                <figure class="product-media">
+                                                                    <a href="demo3-product.html">
+                                                                        <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                    </a>
+                                                                </figure>
+                                                                <div class="product-details">
+                                                                    <h3 class="product-name">
+                                                                        <a >{items.name}</a>
+                                                                    </h3>
+                                                                    <div class="product-price">
+                                                                        <span class="price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                    </div>
+                                                                    <div class="ratings-container">
+                                                                        <div class="ratings-full">
+                                                                            <span class="ratings" style={{ width: "40%" }}></span>
+                                                                            <span class="tooltiptext tooltip-top"></span>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/10.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Hand Electric Cell</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <span class="price">$26.00</span>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "100%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/11.jpg" alt="product" width="100" height="100" style={{ backgroundolor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Women Hempen Hood
-                                                                    a Mourner</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <span class="price">$30.00</span>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "20%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                        ))
+                                                    }
+
+
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-6 mb-4 ">
-                                            <div class="widget widget-products appear-animate" data-animation-options="{
-                                            'name': 'fadeIn',
-                                            'delay': '.3s'
-                                        }">
+                                            <div class="widget widget-products ">
                                                 <h4 class="widget-title font-weight-bold">Latest Products</h4>
                                                 <div class="products-col">
                                                     <div class="product product-list-sm">
@@ -639,10 +633,7 @@ const HomePage = () => {
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-6 mb-4">
-                                            <div class="widget widget-products appear-animate" data-animation-options="{
-                                            'name': 'fadeInRightShorter',
-                                            'delay': '.5s'
-                                        }">
+                                            <div class="widget widget-products ">
                                                 <h4 class="widget-title font-weight-bold">Best of the Week</h4>
                                                 <div class="products-col">
                                                     <div class="product product-list-sm">
@@ -738,15 +729,15 @@ const HomePage = () => {
                                             }
                                         }
                                     }">
-                                            <figure><img src="images/brands/1.png" alt="brand" width="180" height="100" />
+                                            <figure><img src={brand1} alt="brand" width="180" height="100" />
                                             </figure>
-                                            <figure><img src="images/brands/2.png" alt="brand" width="180" height="100" />
+                                            <figure><img src={brand2} alt="brand" width="180" height="100" />
                                             </figure>
-                                            <figure><img src="images/brands/3.png" alt="brand" width="180" height="100" />
+                                            <figure><img src={brand3} alt="brand" width="180" height="100" />
                                             </figure>
-                                            <figure><img src="images/brands/4.png" alt="brand" width="180" height="100" />
+                                            <figure><img src={brand4} alt="brand" width="180" height="100" />
                                             </figure>
-                                            <figure><img src="images/brands/5.png" alt="brand" width="180" height="100" />
+                                            <figure><img src={brand5} alt="brand" width="180" height="100" />
                                             </figure>
                                         </div>
                                     </div>

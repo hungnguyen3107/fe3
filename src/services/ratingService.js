@@ -14,6 +14,13 @@ const create = (data) => {
         data: data,
     });
 };
+const getCountRating = (params) => {
+    return api.makeAuthRequest({
+        url: `/api/Rating/countRating`,
+        method: "GET",
+        params: params
+    });
+};
 const deleteRating = (params) => {
     return api.makeAuthRequest({
         url: `/api/Rating`,
@@ -24,5 +31,6 @@ const deleteRating = (params) => {
 export const ratingServices = {
     get,
     create,
-    deleteRating
+    deleteRating,
+    getCountRating
 };

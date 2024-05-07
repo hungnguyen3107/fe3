@@ -1,36 +1,121 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import shopBanner from "../../images/demos/demo3/shop_banner.jpg"
 import { useProductContext } from '../../services/helpers/getDataHelpers'
 import FilterComponent from './component/FilterComponent';
 import { productServices } from '../../services/productService';
 import { useParams } from 'react-router-dom';
 import { Pagination } from 'antd';
+import { categoryServices } from '../../services/categoryService';
+import { useCartContext } from '../../services/helpers/getDataCartHelper';
 import "../../css/checkbox.css"
 const ShopePage = () => {
-    const { category, supplier } = useProductContext();
+    const { supplier, handleClickDetail } = useProductContext();
+    const { handleAddToCart } = useCartContext();
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerpage] = useState(9);
     const [totalCount, setTotalCount] = useState(0);
     const [categoryParentId, setCategoryParentId] = useState([]);
+    const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+    const [selectedCheckboxCategory, setSelectedCheckboxCategory] = useState([]);
+    const [category, setCategory] = useState([]);
     const { id } = useParams();
+    const [inputFrom, setInputFrom] = useState(20000);
+    const [inputTo, setInputTo] = useState(100000000);
+
+    const handleInputFromChange = (value) => {
+        setInputFrom(value);
+    };
+
+    const handleInputToChange = (value) => {
+        setInputTo(value);
+    };
+    console.log(selectedCheckboxes)
+    //lọc theo nhà cung cấp 
+    const handleCheckboxChange = (event) => {
+        const checkboxId = event.target.value;
+        const isChecked = event.target.checked;
+        setSelectedCheckboxes(prevState => {
+            if (isChecked) {
+                return [...prevState, checkboxId];
+            } else {
+                return prevState.filter(id => id !== checkboxId);
+            }
+        });
+    };
+    //lọc theo loại sản phẩm
+    const handleCheckboxChangeCategory = (event) => {
+        const checkboxId = event.target.value;
+        const isChecked = event.target.checked;
+
+        setSelectedCheckboxCategory(prevState => {
+            if (isChecked) {
+                return [...prevState, checkboxId];
+            } else {
+                return prevState.filter(id => id !== checkboxId);
+            }
+        });
+    };
+    //lấy dữ liệu theo yêu cầu 
     const getCategoryParnt = async () => {
         try {
-            const res = await productServices.get({
-                CategoryParent_id: id,
-                "Limit": currentPage,
-                "PageIndex": rowsPerPage
+            const params = new URLSearchParams();
+            params.append('CategoryParent_id', id);
+            params.append('Limit', currentPage);
+            params.append('PageIndex', rowsPerPage);
+            // Thêm mỗi giá trị trong mảng vào tham số CategoryList
+            selectedCheckboxCategory.forEach(category => {
+                params.append('CategoryList', category);
             });
+            selectedCheckboxes.forEach(supplier => {
+                params.append('SupplierList', supplier);
+            });
+            const res = await productServices.get(params);
             setCategoryParentId(res.items);
             setTotalCount(res.totalCount);
         } catch (error) {
             console.error(error);
         }
+    };
+    //lấy dữ liệu loại sản phẩm
+    const getCategory = async () => {
+        try {
+            const res = await categoryServices.get({ CategoryParent_id: id })
+            setCategory(res.items)
+            console.log(res.items)
+        } catch (error) {
+            console.log(error)
+        }
     }
+    //hàm tìm kiếm giá
+    const handleSearchPrice = async (event) => {
+        event.preventDefault();
+        try {
+            const params = new URLSearchParams();
+            params.append('CategoryParent_id', id);
+            params.append('Limit', currentPage);
+            params.append('PageIndex', rowsPerPage);
+            // Thêm mỗi giá trị trong mảng vào tham số CategoryList
+            selectedCheckboxCategory.forEach(category => {
+                params.append('CategoryList', category);
+            });
+            selectedCheckboxes.forEach(supplier => {
+                params.append('SupplierList', supplier);
+            });
+            params.append('PriceMin', inputFrom);
+            params.append('PriceMax', inputTo);
+            const res = await productServices.get(params);
+            setCategoryParentId(res.items);
+            setTotalCount(res.totalCount);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     useEffect(() => {
         getCategoryParnt();
-    }, [currentPage, rowsPerPage]);
+        getCategory();
+    }, [currentPage, rowsPerPage, selectedCheckboxCategory, selectedCheckboxes]);
     return (
         <main class="main">
             <div class="page-content mb-10 pb-2">
@@ -51,7 +136,17 @@ const ShopePage = () => {
                                         <ul class="widget-body filter-items search-ul">
                                             {
                                                 category.map((items, index) => (
-                                                    <li key={index} style={{ width: "100%" }}><a >{items.name}</a></li>
+                                                    <li key={index} style={{ width: "100%" }}>
+                                                        <p>
+                                                            <input type="checkbox" id={`checkbox-${index}`}
+                                                                onChange={handleCheckboxChangeCategory}
+                                                                value={items.id}
+                                                                checked={selectedCheckboxCategory[items.id]} />
+                                                            <label htmlFor={`checkbox-${index}`}>
+                                                                <span></span> {items.name}
+                                                            </label>
+                                                        </p>
+                                                    </li>
                                                 ))
                                             }
                                         </ul>
@@ -61,12 +156,17 @@ const ShopePage = () => {
                                         <div class="widget-body mt-3">
                                             <form action="#">
                                                 <div class="filter-price-slider" style={{ margin: "4px 16px 3rem 9px" }}>
+
                                                     <FilterComponent
+                                                        inputFrom={inputFrom}
+                                                        inputTo={inputTo}
                                                         min={20000}
                                                         max={100000000}
                                                         step={10000}
                                                         forid="display2"
                                                         class="SB-2"
+                                                        onInputFromChange={handleInputFromChange}
+                                                        onInputToChange={handleInputToChange}
                                                     />
                                                 </div>
                                                 <div class="filter-actions">
@@ -75,7 +175,7 @@ const ShopePage = () => {
                                                             <div id="display2"></div>
                                                         </span>
                                                     </div>
-                                                    <button type="submit" class="btn btn-dark btn-rounded btn-filter" style={{ fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }}>Filter</button>
+                                                    <button type="submit" class="btn btn-dark btn-rounded btn-filter" style={{ fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleSearchPrice}>Filter</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -86,8 +186,11 @@ const ShopePage = () => {
                                             {supplier.map((items, index) => (
                                                 <li key={index} style={{ width: "100%" }}>
                                                     <p>
-                                                        <input type="checkbox" id={`checkbox-${index}`} />
-                                                        <label htmlFor={`checkbox-${index}`}>
+                                                        <input type="checkbox" id={`checkboxsupplier-${index}`}
+                                                            onChange={handleCheckboxChange}
+                                                            value={items.id}
+                                                            checked={selectedCheckboxes[items.id]} />
+                                                        <label htmlFor={`checkboxsupplier-${index}`}>
                                                             <span></span> {items.name}
                                                         </label>
                                                     </p>
@@ -142,24 +245,26 @@ const ShopePage = () => {
                             <div class="row cols-2 cols-sm-3 product-wrapper" >
                                 {
                                     categoryParentId.map((items, index) => (
-
-                                        <div class="product-wrap" key={index}>
+                                        <div class="product-wrap" key={index} >
                                             <div class="product text-center" >
                                                 <figure class="product-media">
-                                                    <a href="demo3-product.html">
+                                                    <a >
                                                         <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
                                                     </a>
                                                     <div class="product-label-group">
                                                         <label class="product-label label-new">new</label>
-                                                        <label class="product-label label-sale">12% OFF</label>
+                                                        {
+                                                            items.isStatus == 1 ?
+                                                                (<label class="product-label label-sale">Giảm giá</label>) :
+                                                                ""
+                                                        }
+
                                                     </div>
                                                     <div class="product-action-vertical">
-                                                        <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                                        <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
+                                                        <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart" onClick={() => handleAddToCart(items.id)}><FontAwesomeIcon icon={faCartPlus} /></a>
                                                     </div>
                                                     <div class="product-action">
-                                                        <a href="#" class="btn-product btn-quickview" title="Quick View">Quick
-                                                            View</a>
+                                                        <a class="btn-product btn-quickview" title="Quick View" onClick={() => handleClickDetail(items.id)} style={{ cursor: "pointer" }}> Chi tiết</a>
                                                     </div>
                                                 </figure>
                                                 <div class="product-details">
@@ -170,7 +275,10 @@ const ShopePage = () => {
                                                         <a href="demo3-product.html">{items.name}</a>
                                                     </h3>
                                                     <div class="product-price">
-                                                        <ins class="new-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins><del class="old-price">$67.99</del>
+                                                        <ins class="new-price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins>
+                                                        {
+                                                            items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
+                                                        }
                                                     </div>
                                                     <div class="ratings-container">
                                                         <div class="ratings-full">
@@ -189,24 +297,6 @@ const ShopePage = () => {
                             </div>
 
                             <nav class="toolbox toolbox-pagination">
-                                {/* <p class="show-info">Showing <span>12 of 56</span> Products</p>
-                                <ul class="pagination">
-                                    <li class="page-item disabled">
-                                        <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
-                                            <i class="d-icon-arrow-left"></i>Prev
-                                        </a>
-                                    </li>
-                                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a>
-                                    </li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item page-item-dots"><a class="page-link" href="#">6</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link page-link-next" href="#" aria-label="Next">
-                                            Next<i class="d-icon-arrow-right"></i>
-                                        </a>
-                                    </li>
-                                </ul> */}
                                 <Pagination
                                     current={currentPage}
                                     pageSize={rowsPerPage}

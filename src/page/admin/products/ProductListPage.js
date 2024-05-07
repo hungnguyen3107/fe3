@@ -14,6 +14,7 @@ const ProductListPage = () => {
     const [search, setSearch] = useState("");
     const [totalCount, setTotalCount] = useState(0);
     const { handleOnclickId } = useProductContext();
+    //lấy dữ liệu sản phẩm 
     const getProduct = async () => {
         try {
             const res = await productServices.get({
@@ -30,6 +31,7 @@ const ProductListPage = () => {
             console.error(error);
         }
     }
+    //xóa dữ liệu sản phẩm
     const handleDeleteProduct = async (id) => {
         try {
             const res = await productServices.deleteProduct({ Id: id });
@@ -42,6 +44,7 @@ const ProductListPage = () => {
             console.error(error);
         }
     }
+    //load dữ liệu 
     useEffect(() => {
         getProduct();
     }, [currentPage, rowsPerPage, search])

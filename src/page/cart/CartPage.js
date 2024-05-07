@@ -11,9 +11,37 @@ import { faMinus } from '@fortawesome/free-solid-svg-icons';
 import LoginPage from '../login/LoginPage'
 import { Modal } from 'antd';
 const CartPage = () => {
-    const { dataUser, dataProducts, calculateTotalPrice, handleRemoveItem, isDataCart } = useCartContext();
+    const { dataUser, dataProducts, calculateTotalPrice, handleRemoveItem, isDataCart, setDataCart } = useCartContext();
     const { isModalOpen, handleOk, handleCancel, showModal } = useProductContext();
     const totalPrice = calculateTotalPrice();
+    //hàm cập nhập sản phẩm khi tăng số lượng
+    const increaseQuantity = (productId) => {
+        const products = JSON.parse(sessionStorage.getItem('products')) || [];
+        const productIndex = products.findIndex(item => item.productId[0].id === productId);
+        if (productIndex !== -1) {
+            const product = products[productIndex];
+            product.quantity++; // Tăng số lượng lên 1 đơn vị
+            sessionStorage.setItem('products', JSON.stringify(products));
+            setDataCart(!isDataCart);
+            return product.quantity; // Trả về số lượng mới
+        }
+        return null;
+    };
+    //hàm cập nhập sản phẩm khi giảm số lượng
+    const decreaseQuantity = (productId) => {
+        const products = JSON.parse(sessionStorage.getItem('products')) || [];
+        const productIndex = products.findIndex(item => item.productId[0].id === productId);
+        if (productIndex !== -1) {
+            const product = products[productIndex];
+            if (product.quantity > 1) { // Đảm bảo số lượng không nhỏ hơn 1
+                product.quantity--; // Giảm số lượng xuống 1 đơn vị
+                sessionStorage.setItem('products', JSON.stringify(products));
+                setDataCart(!isDataCart);
+                return product.quantity; // Trả về số lượng mới
+            }
+        }
+        return null;
+    };
     useEffect(() => {
         JSON.parse(sessionStorage.getItem('products'))
     }, [isDataCart])
@@ -59,9 +87,9 @@ const CartPage = () => {
                                                 </td>
                                                 <td class="product-quantity">
                                                     <div class="input-group">
-                                                        <button class="quantity-minus"><FontAwesomeIcon icon={faMinus} /></button>
-                                                        <input class="quantity form-control" type="number" min="1" max="1000000" />
-                                                        <button class="quantity-plus "><FontAwesomeIcon icon={faPlus} /></button>
+                                                        <button class="quantity-minus" onClick={() => decreaseQuantity(items.productId[0].id)}><FontAwesomeIcon icon={faMinus} /></button>
+                                                        <input class="quantity form-control" type="number" min="1" max="1000000" value={items.quantity} />
+                                                        <button class="quantity-plus " onClick={() => increaseQuantity(items.productId[0].id)}><FontAwesomeIcon icon={faPlus} /></button>
                                                     </div>
                                                 </td>
                                                 <td class="product-price">
@@ -79,81 +107,12 @@ const CartPage = () => {
                             </table>
                             <div class="cart-actions mb-6 pt-4">
                                 <a class="btn btn-dark btn-md btn-rounded btn-icon-left mr-4 mb-4" style={{ fontWeight: "700" }}><NavLink to="/"><FontAwesomeIcon icon={faArrowLeft} style={{ marginRight: "0.8rem", fontSize: "2rem" }} />Continue Shopping </NavLink></a>
-                                <button type="submit" class="btn btn-outline btn-dark btn-md btn-rounded btn-disabled">Update
-                                    Cart</button>
-                            </div>
-                            <div class="cart-coupon-box mb-8">
-                                <h4 class="title coupon-title text-uppercase ls-m">Coupon Discount</h4>
-                                <input type="text" name="coupon_code" class="input-text form-control text-grey ls-m mb-4" id="coupon_code" value placeholder="Enter coupon code here..." />
-                                <button type="submit" class="btn btn-md btn-dark btn-rounded btn-outline">Apply
-                                    Coupon</button>
                             </div>
                         </div>
                         <aside class="col-lg-4 sticky-sidebar-wrapper">
                             <div class="sticky-sidebar" data-sticky-options="{'bottom': 20}">
                                 <div class="summary mb-4">
                                     <h3 class="summary-title text-left">Cart Totals</h3>
-                                    <table class="shipping">
-                                        <tr class="summary-subtotal">
-                                            <td>
-                                                <h4 class="summary-subtitle">Subtotal</h4>
-                                            </td>
-                                            <td>
-                                                <p class="summary-subtotal-price">$426.99</p>
-                                            </td>
-                                        </tr>
-                                        <tr class="sumnary-shipping shipping-row-last">
-                                            <td colspan="2">
-                                                <h4 class="summary-subtitle">Calculate Shipping</h4>
-                                                <ul>
-                                                    <li>
-                                                        <div class="custom-radio">
-                                                            <input type="radio" id="flat_rate" name="shipping" class="custom-control-input" checked />
-                                                            <label class="custom-control-label" for="flat_rate">Flat
-                                                                rate</label>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="custom-radio">
-                                                            <input type="radio" id="free-shipping" name="shipping" class="custom-control-input" />
-                                                            <label class="custom-control-label" for="free-shipping">Free
-                                                                shipping</label>
-                                                        </div>
-                                                    </li>
-                                                    <li>
-                                                        <div class="custom-radio">
-                                                            <input type="radio" id="local_pickup" name="shipping" class="custom-control-input" />
-                                                            <label class="custom-control-label" for="local_pickup">Local
-                                                                pickup</label>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <div class="shipping-address">
-                                        <label>Shipping to <strong>CA.</strong></label>
-                                        <div class="select-box">
-                                            <select name="country" class="form-control">
-                                                <option value="us" selected>United States (US)</option>
-                                                <option value="uk"> United Kingdom</option>
-                                                <option value="fr">France</option>
-                                                <option value="aus">Austria</option>
-                                            </select>
-                                        </div>
-                                        <div class="select-box">
-                                            <select name="country" class="form-control">
-                                                <option value="us" selected>California</option>
-                                                <option value="uk">Alaska</option>
-                                                <option value="fr">Delaware</option>
-                                                <option value="aus">Hawaii</option>
-                                            </select>
-                                        </div>
-                                        <input type="text" class="form-control" name="code" placeholder="Town / City" />
-                                        <input type="text" class="form-control" name="code" placeholder="ZIP" />
-                                        <a href="#" class="btn btn-md btn-dark btn-rounded btn-outline">Update
-                                            totals</a>
-                                    </div>
                                     <table class="total">
                                         <tr class="summary-subtotal">
                                             <td>

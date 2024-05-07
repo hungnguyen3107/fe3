@@ -19,13 +19,15 @@ const AddProductPage = () => {
     const [form] = Form.useForm();
     const { id } = useParams()
     const [descriptionCkData, setDescriptionCkData] = useState('');
-    const [isStatus, setIsStatus] = useState(0);
+    const [isStatus, setIsStatus] = useState(1);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const { supplier, category, getProduct } = useProductContext();
     const [dataProductDetail, setDataProductDetail] = useState([0]);
+    const [fileList, setFileList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerpage] = useState(8);
+    //lấy dữ liệu của một sản phẩm 
     const getDataProductDetail = async () => {
         try {
             const res = await productServices.get({
@@ -39,10 +41,13 @@ const AddProductPage = () => {
             console.error(error);
         }
     }
-    const handleCheckboxChange = (e) => {
-        const value = e.target.checked ? 1 : 0;
+    //lấy dữ liệu trạng thái khi click
+    const handleCheckboxChange = (value) => {
         setIsStatus(value);
+        console.log("isStatus", isStatus);
     };
+    console.log(isStatus)
+    //hiển thị hình ảnh
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -50,6 +55,7 @@ const AddProductPage = () => {
         setPreviewImage(file.url || file.preview);
         setPreviewOpen(true);
     };
+    //lấy file
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
     const uploadButton = (
         <button
@@ -73,6 +79,7 @@ const AddProductPage = () => {
         const data = editor.getData();
         setDescriptionCkData(data);
     };
+    //hiện thị dữ liệu hình ảnh
     useEffect(() => {
         if (id && dataProductDetail.length > 0 && dataProductDetail[0].image) {
             const newFileList = dataProductDetail[0].image.map((imageName, index) => {
@@ -91,6 +98,7 @@ const AddProductPage = () => {
         getDataProductDetail();
 
     }, [id]);
+    //hiện thị dữ liệu một sản phẩm lên form
     useEffect(() => {
         console.log("dataProductDetail:", dataProductDetail[0]);
         if (id && dataProductDetail && dataProductDetail.length > 0) {
@@ -119,11 +127,12 @@ const AddProductPage = () => {
             });
         }
     }, [dataProductDetail, form]);
+    //hàm gửi dữ liệu đi
     const onFinish = async (values) => {
         if (id && dataProductDetail && dataProductDetail.length > 0) {
             try {
                 const formData = new FormData();
-                console.log("data", values)
+                console.log("data", values, isStatus)
                 if (fileList && fileList.length > 0) {
                     fileList.forEach(file => {
                         const fileObj = file.originFileObj;
@@ -155,7 +164,7 @@ const AddProductPage = () => {
         } else {
             try {
                 const formData = new FormData();
-                console.log(values)
+                // console.log(values)
                 if (fileList) {
                     fileList.forEach(file => {
                         const fileObj = file.originFileObj;
@@ -184,7 +193,7 @@ const AddProductPage = () => {
             }
         }
     }
-    const [fileList, setFileList] = useState([]);
+
     return (
         <div class="page-body">
             <div class="container-fluid">
@@ -290,14 +299,22 @@ const AddProductPage = () => {
                                         <div class="form-group">
                                             <label class="col-form-label"><span>*</span> Status</label>
                                             <div class="m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated">
-                                                <Form.Item name="IsStatus" valuePropName="checked">
-                                                    <Checkbox onChange={handleCheckboxChange}>Khuyến mãi</Checkbox>
+                                                <Form.Item name="IsStatus"  >
+                                                    <Select
+                                                        defaultValue={isStatus}
+                                                        style={{ width: 120 }}
+                                                        onChange={handleCheckboxChange}
+                                                        options={[
+                                                            { value: 1, label: 'Giảm giá' },
+                                                            { value: 2, label: 'Không giảm giá' },
+                                                        ]}
+                                                    />
                                                 </Form.Item>
                                             </div>
                                         </div>
                                         <label class="col-form-label pt-0"> Product Upload</label>
                                         <Upload
-                                            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                                            // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                                             listType="picture-card"
                                             fileList={fileList}
                                             onPreview={handlePreview}

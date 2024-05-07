@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
@@ -11,16 +11,20 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faMinus } from '@fortawesome/free-solid-svg-icons';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { message, Tabs } from 'antd';
+import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons';
+import { Grid, message, Tabs } from 'antd';
 import { NavLink } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import LoginPage from '../login/LoginPage';
 import icon from "../../images/icon.png"
 import { productServices } from '../../services/productService';
-import { Modal } from 'antd';
+import style from '../../css/product-viewer.module.scss';
+import styled from 'styled-components';
+import { Modal, Pagination } from 'antd';
+import { smoothHorizontalScrolling } from '../../services/helpers/smoothHorizontalScrolling';
 const ProductDetailPage = () => {
     const { TabPane } = Tabs;
-    const { isModalOpen, handleOk, handleCancel, showModal } = useProductContext();
+    const { isModalOpen, handleOk, handleCancel, showModal, handleClickDetail } = useProductContext();
     const { isDataCart, setDataCart, dataUser } = useCartContext();
     const [isRating, setIsRating] = useState(false);
     const [productId, setProductId] = useState([]);
@@ -30,26 +34,39 @@ const ProductDetailPage = () => {
     const [dataRating, setDataRating] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerpage] = useState(8);
+    const [modal, setModal] = useState(false);
+    const [data, setData] = useState();
+    const [totalCount, setTotalCount] = useState(0);
+    const [countRating, setCountRating] = useState(0);
+    const [idCategory, setIdCategory] = useState();
+    const [productSimilar, setProductSimilar] = useState([]);
+    const [dragDown, setDragDown] = useState(0);
+    const [dragProduct, setDragProduct] = useState(0);
+    const [isDrag, setIsDrag] = useState(false);
+    const productSimilarSliderRef = useRef();
+    const productSimilarRef = useRef();
     const { id } = useParams();
+
     const handleRatingClick = (value) => {
         setRating(value);
     };
     const handleCommentChange = (event) => {
         setComment(event.target.value);
     };
-    // const getProductDetail = async () => {
-    //     try {
-    //         const res = await productServices.get({
-    //             Id: id,
-    //             Limit: currentPage,
-    //             PageIndex: rowsPerPage,
-    //         });
-    //         setProductId(res.items);
-    //         console.log("productdetail", productId)
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
+    //nút chuyển slider
+    const handleScrollProductSimilarRight = () => {
+        const maxScrollLeft = productSimilarSliderRef.current.scrollWidth - productSimilarSliderRef.current.clientWidth;
+        console.log(maxScrollLeft);
+        if (productSimilarSliderRef.current.scrollLeft < maxScrollLeft) {
+            smoothHorizontalScrolling(productSimilarSliderRef.current, 250, productSimilarSliderRef.current.clientWidth, productSimilarSliderRef.current.scrollWidth);
+        }
+    };
+    const handleScrollProductSimilarLeft = () => {
+        if (productSimilarSliderRef.current.scrollLeft > 0) {
+            smoothHorizontalScrolling(productSimilarSliderRef.current, 250, -productSimilarRef.current.clienWidth, productSimilarSliderRef.current.scrolllWidth)
+        }
+    }
+    //lấy dữ liệu sản phẩm theo id 
     const getProductDetail = async () => {
         try {
             const res = await productServices.get({
@@ -59,6 +76,30 @@ const ProductDetailPage = () => {
             });
             if (res) {
                 setProductId(res.items);
+                setData({
+                    image: `https://localhost:7285/Images/${res.items[0].image[0]}`,
+                    index: 0
+                })
+                setIdCategory(res.items[0].category.id);
+                // console.log("id", res.items[0].category.id)
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //lấy dữ liệu sản phẩm tương tự similar
+    const getProductSimilar = async () => {
+        try {
+            const res = await productServices.get({
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage,
+                CategoryList: idCategory
+            });
+            if (res) {
+                setProductSimilar(res.items);
+                console.log(res.items)
+                console.log(idCategory)
             }
 
         } catch (error) {
@@ -68,42 +109,67 @@ const ProductDetailPage = () => {
     //lấy dữ liệu đánh giá sao
     const getRating = async () => {
         try {
-            const res = await ratingServices.get({ "Product_id": id });
+            const res = await ratingServices.get({
+                "Product_id": id,
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage
+            });
             setDataRating(res.items);
+            setTotalCount(res.totalCount);
         } catch (error) {
             console.error(error);
         }
     }
+    //lấy số lượng sao
+    const getCountRating = async () => {
+        try {
+            const res = await ratingServices.getCountRating({
+                "Product_id": id,
+                "Limit": currentPage,
+                "PageIndex": rowsPerPage
+            });
+            setCountRating(res);
+            console.log(res);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //gửi bình luận đi
     const handleSubmit = (event) => {
         event.preventDefault();
         const res = ratingServices.create({ "star": rating, "content": comment, "product_id": id, "user_id": dataUser.id })
         if (res) {
             message.success("Cảm ơn bạn đã nhận xét sản phẩm!")
+            getRating();
         } else {
             message.error(res.error)
         }
     };
+    // mở modal bình luận
     const handleClickRating = () => {
         setIsRating(!isRating);
     }
+    //giảm số lượng
     const decreaseQuantity = () => {
         if (quantity > 1) {
             setQuantity(prevQuantity => prevQuantity - 1);
         }
     };
+    //tăng số lượng
     const increaseQuantity = () => {
         if (quantity < 1000000) {
             setQuantity(prevQuantity => prevQuantity + 1);
         }
     };
+    //thêm sản phẩm vào giỏ hàng
     const handleAddToCart = (id) => {
         const products = JSON.parse(sessionStorage.getItem('products')) || [];
         const productIndex = products.findIndex(item => item.productId[0].id === id);
         if (productIndex !== -1) {
             const product = products[productIndex];
             console.log(product);
-            if (product.productId[0].quantity < product.quantity) {
-                message.error(`Cửa hàng chỉ còn lại ${products[0].quantity} sản phẩm`);
+            if (product.productId[0].quantity < product.quantity + quantity) {
+                message.error(`Cửa hàng chỉ còn lại ${product.productId[0].quantity} sản phẩm`);
             } else {
                 const updatedProducts = [...products];
                 updatedProducts[productIndex].quantity += quantity;
@@ -124,13 +190,77 @@ const ProductDetailPage = () => {
             }
         }
     };
+    //load dữ liệu ra
     useEffect(() => {
         getRating();
-        getProductDetail()
-    }, [])
+        getProductDetail();
+        getCountRating();
+        getProductSimilar();
+    }, [currentPage, rowsPerPage, idCategory, id])
     useEffect(() => {
         JSON.parse(sessionStorage.getItem('products'))
     }, [isDataCart])
+    useEffect(() => {
+        if (isDrag) {
+            if (dragProduct < dragDown) handleScrollProductSimilarRight();
+            if (dragProduct > dragDown) handleScrollProductSimilarLeft();
+        }
+    }, [dragDown, dragProduct, isDrag])
+    const onDragStart = e => {
+        setIsDrag(true);
+        setDragDown(e.screenX);
+    }
+    const onDragEnd = e => {
+        setIsDrag(false);
+    }
+    const onDragEnter = e => {
+        setDragProduct(e.screenX);
+    }
+    // const imgAction = (action) => {
+    //     let i = data.index;
+    //     if (action === 'next-img') {
+    //         setData({ image: productData.images[i + 1], index: i + 1 });
+    //     }
+    //     if (action === 'previos-img') {
+    //         setData({ image: productData.images[i - 1], index: i - 1 });
+    //     }
+    // }
+    const getRatingPercentage = (rating) => {
+        const ratingObj = countRating && countRating.find((item) => item.star === rating);
+        return ratingObj ? (ratingObj.count / totalCount * 100).toFixed(2) : '0';
+    };
+    //tính tổng số sao
+    let totalStars = 0;
+    countRating && countRating.forEach(value => {
+        totalStars += (value.star * value.count);
+    });
+    //css slider
+    const ProductSlider = styled.div`
+display: grid;
+grid-template-columns:repeat(${productSimilar.length},243px);
+gap: 6px;
+transition: all 0.3s linear;
+user-select: none;
+overflow-y: hidden;
+overflow-x: auto;
+overflow:hidden;
+padding-top: 28px;
+padding-bottom: 28px;
+scroll-behavior: smooth;
+
+.movieItem {
+    transform: scale(1);
+    max-width: 228px;
+    max-height: 414px;
+    width: 100%;
+    height: 100%;
+    transition: all 0.3s linear;
+    user-select: none;
+    overflow: hidden;
+    transform:center left;
+    position: relative;
+}
+`;
     return (
         <main class="main mt-6 single-product">
             <div class="page-content mb-10 pb-9">
@@ -139,35 +269,23 @@ const ProductDetailPage = () => {
                         <div class="col-md-6">
                             <div class="product-gallery">
                                 <div class="product-single-carousel owl-carousel owl-theme owl-nav-inner row cols-1">
-                                    {
-                                        productId.map((items, index) => (
-                                            <figure class="product-image">
-                                                <img src={`https://localhost:7285/Images/${items.image[0]}`} data-zoom-image="images/demos/demo3/product/product-1-800x900.jpg" alt="Blue Pinafore Denim Dress" width="800" height="900" style={{ backgroundColor: "#f5f5f5" }} />
-                                            </figure>
-                                        ))
-                                    }
+
+                                    <figure class="product-image">
+                                        <img src={data ? data.image : null} alt="" data-zoom-image="images/demos/demo3/product/product-1-800x900.jpg" width="800" height="900" style={{ backgroundColor: "#f5f5f5" }} />
+                                    </figure>
                                 </div>
                                 <div class="product-thumbs-wrap">
-                                    <div class="product-thumbs">
-                                        <div class="product-thumb active">
-                                            <img src="images/demos/demo3/product/product-1-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
+                                    {productId.map((item, index) => (
+                                        <div class="product-thumbs" key={index} style={{ border: data.image === item.image ? '1px solid blue' : '' }}>
+                                            {item.image.map((imageItem, imageIndex) => (
+                                                <div key={imageIndex} onClick={() => setData({ image: `https://localhost:7285/Images/${imageItem}`, index: imageIndex })}>
+                                                    <div class="product-thumb">
+                                                        <img src={`https://localhost:7285/Images/${imageItem}`} alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div class="product-thumb">
-                                            <img src="images/demos/demo3/product/product-2-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
-                                        </div>
-                                        <div class="product-thumb">
-                                            <img src="images/demos/demo3/product/product-3-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
-                                        </div>
-                                        <div class="product-thumb">
-                                            <img src="images/demos/demo3/product/product-4-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
-                                        </div>
-                                        <div class="product-thumb">
-                                            <img src="images/demos/demo3/product/product-5-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
-                                        </div>
-                                        <div class="product-thumb">
-                                            <img src="images/demos/demo3/product/product-6-137x154.jpg" alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
-                                        </div>
-                                    </div>
+                                    ))}
                                     <button class="thumb-up disabled"><i class="fas fa-chevron-left"></i></button>
                                     <button class="thumb-down disabled"><i class="fas fa-chevron-right"></i></button>
                                 </div>
@@ -191,11 +309,17 @@ const ProductDetailPage = () => {
                                         </div>
                                         <div class="product-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
                                         <div class="ratings-container">
-                                            <div class="ratings-full">
-                                                <span class="ratings" style={{ width: "80%" }}></span>
-                                                <span class="tooltiptext tooltip-top"></span>
+                                            <div class="comment-rating ratings-container">
+
+                                                {[1, 2, 3, 4, 5].map((starValue) => (
+                                                    <FontAwesomeIcon
+                                                        key={starValue}
+                                                        icon={faStar}
+                                                        className={`star ${starValue <= Math.ceil(totalStars / totalCount) ? 'yellow' : ''}`}
+                                                    />
+                                                ))}
                                             </div>
-                                            <a href="#product-tab-reviews" class="link-to-tab rating-reviews">( 6 reviews )</a>
+                                            <a href="#product-tab-reviews" class="link-to-tab rating-reviews">( {totalCount} reviews )</a>
                                         </div>
                                         <hr class="product-divider" />
                                         <div class="product-form product-qty">
@@ -260,20 +384,53 @@ const ProductDetailPage = () => {
                                                     <div class="avg-rating">
                                                         <span class="avg-rating-title">Average Rating</span>
                                                         <div class="ratings-container mb-0">
-                                                            <div class="ratings-full">
-                                                                <span class="ratings" style={{ width: "100%" }}></span>
-                                                                <span class="tooltiptext tooltip-top"></span>
+
+                                                            <div class="comment-rating ratings-container">
+
+                                                                {[1, 2, 3, 4, 5].map((starValue) => (
+                                                                    <FontAwesomeIcon
+                                                                        key={starValue}
+                                                                        icon={faStar}
+                                                                        className={`star ${starValue <= Math.ceil(totalStars / totalCount) ? 'yellow' : ''}`}
+                                                                    />
+                                                                ))}
                                                             </div>
-                                                            <span class="rating-reviews">(2 Reviews)</span>
+
+                                                            <span class="rating-reviews">({totalCount} Reviews)</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="ratings-list mb-2">
-                                                    <div class="ratings-item">
+                                                    {[5, 4, 3, 2, 1].map((value) => (
+                                                        <div class="ratings-item">
+                                                            <div class="ratings-container mb-0">
+                                                                <div class="comment-rating ratings-container">
+                                                                    {[1, 2, 3, 4, 5].map((starValue) => (
+                                                                        <FontAwesomeIcon
+                                                                            key={starValue}
+                                                                            icon={faStar}
+                                                                            className={`star ${starValue <= value ? 'yellow' : ''}`}
+                                                                        />
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                            <div class="rating-percent">
+                                                                <span style={{ width: `${getRatingPercentage(value)}%` }}></span>
+
+                                                            </div>
+                                                            <div class="progress-value">{`${getRatingPercentage(value)}%`}</div>
+                                                        </div>
+                                                    ))}
+                                                    {/* <div class="ratings-item">
                                                         <div class="ratings-container mb-0">
-                                                            <div class="ratings-full">
-                                                                <span class="ratings" style={{ width: "100%" }}></span>
-                                                                <span class="tooltiptext tooltip-top"></span>
+                                                            <div class="comment-rating ratings-container">
+                                                                {[1, 2, 3, 4, 5].map((value) => (
+                                                                    <FontAwesomeIcon
+                                                                        key={value}
+                                                                        icon={faStar}
+                                                                        className={`star ${value <= 5 ? 'yellow' : ''}`}
+                                                                    />
+                                                                ))}
                                                             </div>
                                                         </div>
                                                         <div class="rating-percent">
@@ -283,9 +440,14 @@ const ProductDetailPage = () => {
                                                     </div>
                                                     <div class="ratings-item">
                                                         <div class="ratings-container mb-0">
-                                                            <div class="ratings-full">
-                                                                <span class="ratings" style={{ width: "80%" }}></span>
-                                                                <span class="tooltiptext tooltip-top">4.00</span>
+                                                            <div class="comment-rating ratings-container">
+                                                                {[1, 2, 3, 4, 5].map((value) => (
+                                                                    <FontAwesomeIcon
+                                                                        key={value}
+                                                                        icon={faStar}
+                                                                        className={`star ${value <= 4 ? 'yellow' : ''}`}
+                                                                    />
+                                                                ))}
                                                             </div>
                                                         </div>
                                                         <div class="rating-percent">
@@ -328,7 +490,7 @@ const ProductDetailPage = () => {
                                                             <span style={{ width: "0%" }}></span>
                                                         </div>
                                                         <div class="progress-value">0%</div>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                                 <a class="btn btn-dark btn-rounded submit-review-toggle" style={{ padding: "1.22em 2.78em", fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleClickRating}>Submit
                                                     Review</a>
@@ -362,7 +524,7 @@ const ProductDetailPage = () => {
                                                         </div>
                                                     </div>
                                                 </nav>
-                                                <ul class="comments-list">
+                                                <ul class="comments-list" style={{ display: "grid" }}>
                                                     {
                                                         dataRating.map((items, index) => (
                                                             <li key={index}>
@@ -406,24 +568,22 @@ const ProductDetailPage = () => {
 
                                                 </ul>
                                                 <nav class="toolbox toolbox-pagination justify-content-end">
-                                                    <ul class="pagination">
-                                                        <li class="page-item disabled">
-                                                            <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
-                                                                <i class="d-icon-arrow-left"></i>Prev
-                                                            </a>
-                                                        </li>
-                                                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a>
-                                                        </li>
-                                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                                        <li class="page-item page-item-dots"><a class="page-link" href="#">6</a>
-                                                        </li>
-                                                        <li class="page-item">
-                                                            <a class="page-link page-link-next" href="#" aria-label="Next">
-                                                                Next <FontAwesomeIcon icon={faArrowRight} />
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                                    <Pagination
+                                                        current={currentPage}
+                                                        pageSize={rowsPerPage}
+                                                        defaultPageSize={rowsPerPage}
+                                                        // showSizeChanger={true}
+                                                        // pageSizeOptions={["10", "20", "30", '100']}
+                                                        total={totalCount}
+                                                        locale={{ items_per_page: "/ trang" }}
+                                                        showTotal={(total, range) => <span>Tổng số: {total}</span>}
+                                                        onShowSizeChange={(current, pageSize) => {
+                                                            setCurrentPage(current);
+                                                            setRowsPerpage(pageSize);
+                                                        }}
+                                                        onChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                                        style={{ display: "flex" }}
+                                                    />
                                                 </nav>
                                             </div>
                                         </div>
@@ -498,276 +658,85 @@ const ProductDetailPage = () => {
                                     </div>
                                 </TabPane>
                             </Tabs>
-                            {/* <ul class="nav nav-tabs justify-content-center" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#product-tab-description">Description</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#product-tab-additional">Additional information</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#product-tab-shipping-returns">Shipping &amp; Returns</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#product-tab-reviews">Reviews (1)</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane active in mb-3" id="product-tab-description">
-                                    <div class="row mt-6">
-                                        <div class="col-md-6">
-                                            <h5 class="description-title mb-4 font-weight-semi-bold ls-m">Features</h5>
-                                            <p class="mb-2">
-                                                Praesent id enim sit amet.Tdio vulputate eleifend in in tortor.
-                                                ellus massa. siti iMassa ristique sit amet condim vel, facilisis
-                                                quimequistiqutiqu amet condim Dilisis Facilisis quis sapien. Praesent id
-                                                enim sit amet.
-                                            </p>
-                                            <ul class="mb-8">
-                                                <li>Praesent id enim sit amet.Tdio vulputate</li>
-                                                <li>Eleifend in in tortor. ellus massa.Dristique sitii</li>
-                                                <li>Massa ristique sit amet condim vel</li>
-                                                <li>Dilisis Facilisis quis sapien. Praesent id enim sit amet</li>
-                                            </ul>
-                                            <h5 class="description-title mb-3 font-weight-semi-bold ls-m">Specifications
-                                            </h5>
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Material</th>
-                                                        <td class="pl-4">Praesent id enim sit amet.Tdio</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Claimed Size</th>
-                                                        <td class="pl-4">Praesent id enim sit</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Recommended Use
-                                                        </th>
-                                                        <td class="pl-4">Praesent id enim sit amet.Tdio vulputate eleifend
-                                                            in in tortor. ellus massa. siti</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark border-no pl-0">
-                                                            Manufacturer</th>
-                                                        <td class="border-no pl-4">Praesent id enim</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="product-tab-additional">
-                                    <ul class="list-none">
-                                        <li><label>Brands:</label>
-                                            <p>Cinderella, SLS</p>
-                                        </li>
-                                        <li><label>Color:</label>
-                                            <p>Black, Blue, Brown, Green</p>
-                                        </li>
-                                        <li><label>Size:</label>
-                                            <p>Ectra Large, Large, Medium, Small</p>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="tab-pane " id="product-tab-shipping-returns">
-                                    <h6 class="mb-2">Free Shipping</h6>
-                                    <p class="mb-0">We deliver to over 100 countries around the world. For full details of
-                                        the delivery options we offer, please view our <a href="#" class="text-primary">Delivery
-                                            information</a> We hope you’ll love every
-                                        purchase, but if you ever need to return an item you can do so within a month of
-                                        receipt. For full details of how to make a return, please view our <a href="#" class="text-primary">Returns information</a></p>
-                                </div>
-                                <div class="tab-pane active in mb-3" id="product-tab-description">
-                                    <div class="row mt-6">
-                                        <div class="col-md-6">
-                                            <h5 class="description-title mb-4 font-weight-semi-bold ls-m">Features</h5>
-                                            <p class="mb-2">
-                                                Praesent id enim sit amet.Tdio vulputate eleifend in in tortor.
-                                                ellus massa. siti iMassa ristique sit amet condim vel, facilisis
-                                                quimequistiqutiqu amet condim Dilisis Facilisis quis sapien. Praesent id
-                                                enim sit amet.
-                                            </p>
-                                            <ul class="mb-8">
-                                                <li>Praesent id enim sit amet.Tdio vulputate</li>
-                                                <li>Eleifend in in tortor. ellus massa.Dristique sitii</li>
-                                                <li>Massa ristique sit amet condim vel</li>
-                                                <li>Dilisis Facilisis quis sapien. Praesent id enim sit amet</li>
-                                            </ul>
-                                            <h5 class="description-title mb-3 font-weight-semi-bold ls-m">Specifications
-                                            </h5>
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Material</th>
-                                                        <td class="pl-4">Praesent id enim sit amet.Tdio</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Claimed Size</th>
-                                                        <td class="pl-4">Praesent id enim sit</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark pl-0">Recommended Use
-                                                        </th>
-                                                        <td class="pl-4">Praesent id enim sit amet.Tdio vulputate eleifend
-                                                            in in tortor. ellus massa. siti</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="font-weight-semi-bold text-dark border-no pl-0">
-                                                            Manufacturer</th>
-                                                        <td class="border-no pl-4">Praesent id enim</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
+
                         </div>
                         <section class="related-product mt-10">
                             <h2 class="title title-center mb-1 ls-normal">Related Products</h2>
-                            <div class="owl-carousel owl-theme owl-nav-full row cols-2 cols-md-3 cols-lg-4" data-owl-options="{
-							'items': 5,
-							'nav': false,
-							'loop': false,
-							'dots': true,
-							'margin': 20,
-							'responsive': {
-								'0': {
-									'items': 2
-								},
-								'768': {
-									'items': 3
-								},
-								'992': {
-									'items': 4,
-									'dots': false,
-									'nav': true
-								}
-							}
-						}">
-                                <div class="product text-center">
-                                    <figure class="product-media">
-                                        <a href="demo3-product.html">
-                                            <img src="images/demos/demo3/products/2.jpg" alt="product" width="280" height="315" />
-                                        </a>
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                            <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
-                                        </div>
-                                        <div class="product-action">
-                                            <a href="#" class="btn-product btn-quickview" title="Quick View">Quick View</a>
-                                        </div>
-                                    </figure>
-                                    <div class="product-details">
-                                        <div class="product-cat"><a href="demo3-shop.html">Bags</a></div>
-                                        <h3 class="product-name">
-                                            <a href="demo3-product.html">Fashional Handbag</a>
-                                        </h3>
-                                        <div class="product-price">
-                                            <span class="price">$83.32</span>
-                                        </div>
-                                        <div class="ratings-container">
-                                            <div class="ratings-full">
-                                                <span class="ratings" style={{ width: "20%" }}></span>
-                                                <span class="tooltiptext tooltip-top"></span>
-                                            </div>
-                                        </div>
+                            <div class="owl-carousel owl-theme owl-nav-full row cols-2 cols-md-3 cols-lg-4">
+                                <ProductsRowContainer draggable='false'>
+                                    <ProductSlider
+                                        ref={productSimilarSliderRef}
+                                        draggable='true'
+                                        onDragStart={onDragStart}
+                                        onDragEnd={onDragEnd}
+                                        onDragEnter={onDragEnter}
+                                    >
+                                        {
+                                            productSimilar.map((items, index) => (
+                                                <div class="product text-center" key={index} ref={productSimilarRef} onClick={() => handleClickDetail(items.id)}>
+                                                    <figure class="product-media">
+                                                        <a style={{ cursor: "pointer" }}>
+                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
+                                                        </a>
+                                                        <div class="product-label-group">
+                                                            <label class="product-label label-new">new</label>
+                                                            {
+                                                                items.isStatus == 1 ?
+                                                                    (<label class="product-label label-sale">Giảm giá</label>) :
+                                                                    ""
+                                                            }
+                                                        </div>
+                                                        <div class="product-action-vertical">
+                                                            <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><FontAwesomeIcon icon={faCartPlus} /></a>
+
+                                                        </div>
+                                                        <div class="product-action">
+                                                            <a class="btn-product btn-quickview" title="Quick View" style={{ cursor: "pointer" }} onClick={() => handleClickDetail(items.id)}>Chi tiết</a>
+                                                        </div>
+                                                    </figure>
+                                                    <div class="product-details" style={{
+                                                        paddingTop: "1.4rem",
+                                                        paddingBottom: "2rem"
+                                                    }}>
+                                                        {/* <div class="product-cat"><a href="demo3-shop.html">Women’s</a>
+                                                            </div> */}
+                                                        <h3 class="product-name" style={{
+                                                            fontFamily: "inherit",
+                                                            fontSize: "1.4rem",
+                                                            fontWeight: 400,
+                                                            letterSpacing: "-0.01em",
+                                                            whitespace: "nowrap"
+                                                        }}>
+                                                            {items.name}
+                                                        </h3>
+                                                        <div class="product-price" style={{
+                                                            fontSize: "1.6rem",
+                                                            fontWeight: 600,
+                                                            lineHeight: 1.86
+                                                        }}>
+                                                            <ins class="new-price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins>
+                                                            {
+                                                                items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
+                                                            }
+                                                        </div>
+                                                        {/* <div class="ratings-container">
+                                                                <div class="ratings-full">
+                                                                    <span class="ratings" style={{ width: "60%" }}></span>
+                                                                    <span class="tooltiptext tooltip-top"></span>
+                                                                </div>
+                                                            </div> */}
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </ProductSlider>
+                                    <div className='btnLeft' onClick={handleScrollProductSimilarLeft}>
+                                        <FontAwesomeIcon icon={faAngleLeft} />
                                     </div>
-                                </div>
-                                <div class="product text-center">
-                                    <figure class="product-media">
-                                        <a href="demo3-product.html">
-                                            <img src="images/demos/demo3/products/4.jpg" alt="product" width="280" height="315" />
-                                        </a>
-                                        <div class="product-label-group">
-                                            <label class="product-label label-new">new</label>
-                                        </div>
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                            <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
-                                        </div>
-                                        <div class="product-action">
-                                            <a href="#" class="btn-product btn-quickview" title="Quick View">Quick View</a>
-                                        </div>
-                                    </figure>
-                                    <div class="product-details">
-                                        <div class="product-cat"><a href="demo3-shop.html">Bags</a></div>
-                                        <h3 class="product-name">
-                                            <a href="demo3-product.html">A Dress-suit Valise</a>
-                                        </h3>
-                                        <div class="product-price">
-                                            <span class="price">$242.12</span>
-                                        </div>
-                                        <div class="ratings-container">
-                                            <div class="ratings-full">
-                                                <span class="ratings" style={{ width: "60%" }}></span>
-                                                <span class="tooltiptext tooltip-top"></span>
-                                            </div>
-                                        </div>
+                                    <div className='btnRight' onClick={handleScrollProductSimilarRight}>
+                                        <FontAwesomeIcon icon={faAngleRight} />
                                     </div>
-                                </div>
-                                <div class="product text-center">
-                                    <figure class="product-media">
-                                        <a href="demo3-product.html">
-                                            <img src="images/demos/demo3/products/5.jpg" alt="product" width="280" height="315" />
-                                        </a>
-                                        <div class="product-label-group">
-                                            <label class="product-label label-sale">27% off</label>
-                                        </div>
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                            <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
-                                        </div>
-                                        <div class="product-action">
-                                            <a href="#" class="btn-product btn-quickview" title="Quick View">Quick View</a>
-                                        </div>
-                                    </figure>
-                                    <div class="product-details">
-                                        <div class="product-cat"><a href="demo3-shop.html">Watch</a></div>
-                                        <h3 class="product-name">
-                                            <a href="demo3-product.html">Fashion Electric Wrist Watch</a>
-                                        </h3>
-                                        <div class="product-price">
-                                            <ins class="new-price">$472.14</ins><del class="old-price">$524.45</del>
-                                        </div>
-                                        <div class="ratings-container">
-                                            <div class="ratings-full">
-                                                <span class="ratings" style={{ width: "40%" }}></span>
-                                                <span class="tooltiptext tooltip-top"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product text-center">
-                                    <figure class="product-media">
-                                        <a href="demo3-product.html">
-                                            <img src="images/demos/demo3/products/6.jpg" alt="product" width="280" height="315" />
-                                        </a>
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-cart" data-toggle="modal" data-target="#addCartModal" title="Add to cart"><i class="d-icon-bag"></i></a>
-                                            <a href="#" class="btn-product-icon btn-wishlist" title="Add to wishlist"><i class="d-icon-heart"></i></a>
-                                        </div>
-                                        <div class="product-action">
-                                            <a href="#" class="btn-product btn-quickview" title="Quick View">Quick View</a>
-                                        </div>
-                                    </figure>
-                                    <div class="product-details">
-                                        <div class="product-cat"><a href="demo3-shop.html">Women’s</a></div>
-                                        <h3 class="product-name">
-                                            <a href="demo3-product.html">Fashional Handbag</a>
-                                        </h3>
-                                        <div class="product-price">
-                                            <span class="price">$72.34</span>
-                                        </div>
-                                        <div class="ratings-container">
-                                            <div class="ratings-full">
-                                                <span class="ratings" style={{ width: "80%" }}></span>
-                                                <span class="tooltiptext to oltip-top"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </ProductsRowContainer>
                             </div>
                         </section>
                     </div>
@@ -778,3 +747,62 @@ const ProductDetailPage = () => {
 }
 
 export default ProductDetailPage
+
+const ProductsRowContainer = styled.div`
+    background-color: var(--color-background);
+    color: var(--color-white);
+    padding: 20px 20px 0;
+    position:relative;
+    width: 100%;
+    height: 100%;
+    .btnLeft{
+        position:absolute;
+        top:30%;
+        left:19px;
+        z-index:20;
+        transform-origin:center;
+        current:pointer;
+        background-color:rgba(0,0,0,0.5);
+        height:100px;
+        width:50px;
+        border-radius:4px;
+        display:flex;
+        align-items:center;
+        transform:translateY(-20%);
+        &:hover svg{
+            opacity:1;
+            transform:scale(1.2);
+        }
+        svg {
+            opacity:0.7;
+            font-size:50px;
+            transition:all 0.3s linear;
+            color:white;
+        }
+    }
+    .btnRight{
+        position:absolute;
+        top:30%;
+        right:19px;
+        z-index:20;
+        transform-origin:center;
+        current:pointer;
+        background-color:rgba(0,0,0,0.5);
+        height:100px;
+        width:50px;
+        border-radius:4px;
+        display:flex;
+        align-items:center;
+        transform:translateY(-20%);
+        &:hover svg{
+            opacity:1;
+            transform:scale(1.2);
+        }
+        svg {
+            opacity:0.7;
+            font-size:50px;
+            transition:all 0.3s linear;
+            color:white;
+        }
+    }
+`;

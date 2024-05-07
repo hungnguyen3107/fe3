@@ -1,10 +1,10 @@
 import createApiService from '../createApiService'
 const api = createApiService();
-const get = () => {
+const get = (params) => {
     return api.makeAuthRequest({
         url: `/api/ProductCategory`,
         method: "GET",
-        // params: params
+        params: params
     });
 };
 const create = (data) => {
