@@ -314,7 +314,6 @@ const AddProductPage = () => {
                                         </div>
                                         <label class="col-form-label pt-0"> Product Upload</label>
                                         <Upload
-                                            // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                                             listType="picture-card"
                                             fileList={fileList}
                                             onPreview={handlePreview}

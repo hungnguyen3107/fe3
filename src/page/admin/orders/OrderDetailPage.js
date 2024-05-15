@@ -10,7 +10,10 @@ const OrderDetailPage = () => {
     const getDetailOrder = async () => {
         try {
             const res = await orderServices.getId({ Order_id: id });
-            setOrderId(res.items);
+            if (res) {
+                setOrderId(res.items);
+            }
+            console.log(res.items)
         } catch (error) {
             console.error(error);
         }
@@ -19,11 +22,12 @@ const OrderDetailPage = () => {
         try {
             const res = await orderServices.get({ Id: id });
             setInformationOrder(res.items);
-            console.log(res.items)
+            console.log("information", res.items)
         } catch (error) {
             console.error(error);
         }
     }
+    // console.log("information", informationOrder[0].order.createdAt);
     useEffect(() => {
         let totalPrice = 0;
         orderId.forEach(order => {
@@ -131,25 +135,24 @@ const OrderDetailPage = () => {
                                                 <div class="col-12">
                                                     <div class="order-success">
                                                         <h4>summery</h4>
-                                                        {
-                                                            <ul class="order-details">
-                                                                <li>Order Date: {new Date(informationOrder[0].order.createdAt).toLocaleString('vi-VN', { timeZone: 'UTC' })}</li>
-                                                                <li>Order Total: {totalOrderPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</li>
-                                                            </ul>
-                                                        }
+                                                        <ul class="order-details">
+                                                            <li>Order Date: {new Date(informationOrder.length > 0 && informationOrder[0].order.createdAt).toLocaleString('vi-VN', { timeZone: 'UTC' })}</li>
+                                                            <li>Order Total: {totalOrderPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</li>
+                                                        </ul>
+
                                                     </div>
                                                 </div>
 
                                                 <div class="col-12">
                                                     <div class="order-success">
                                                         <h4>shipping address</h4>
-                                                        {
-                                                            <ul class="order-details">
-                                                                <li>{informationOrder[0].order.firstName}{informationOrder[0].order.lastName}</li>
-                                                                <li>{informationOrder[0].order.address}.</li>
-                                                                <li>{informationOrder[0].order.Email},{informationOrder[0].order.phoneNumber}</li>
-                                                            </ul>
-                                                        }
+
+                                                        <ul class="order-details">
+                                                            <li>{informationOrder.length > 0 && informationOrder[0].order.firstName}{informationOrder.length > 0 && informationOrder[0].order.lastName}</li>
+                                                            <li>{informationOrder.length > 0 && informationOrder[0].order.address}.</li>
+                                                            <li>{informationOrder.length > 0 && informationOrder[0].order.Email},{informationOrder.length > 0 && informationOrder[0].order.phoneNumber}</li>
+                                                        </ul>
+
                                                     </div>
                                                 </div>
 

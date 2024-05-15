@@ -48,7 +48,7 @@ export const ProductProvider = ({ children }) => {
     }
     //thay đổi trạng thái 
     const handleChangeStatus = async (id) => {
-        if (changeCount < 3) {
+        if (changeCount < 4) {
             try {
                 const res = await orderServices.changeStatus({ id }, { status: isChangeStatus });
                 if (res) {

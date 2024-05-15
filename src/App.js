@@ -24,7 +24,11 @@ import UserPage from './page/admin/user/UserPage';
 import ProfileAdminPage from './page/admin/user/ProfileAdminPage';
 import BlogPage from './page/blog/BlogPage';
 import BlogDetailPage from './page/blog/BlogDetailPage';
-
+import HomeReportPage from './page/admin/reports/HomeReportPage';
+import OrderReportPage from './page/admin/reports/OrderReportPage';
+import SupplierPage from './page/admin/supplier/SupplierPage';
+import CategoryPage from './page/admin/category/CategoryPage';
+import ProductReportPage from './page/admin/reports/ProductReportPage';
 function App() {
   // const { roles } = useCartContext() || {};
   // console.log("role", roles)
@@ -49,7 +53,11 @@ function App() {
                   <Route path="/Profile" element={<ProfileAdminPage />} />
                   <Route path="/OrderList/:id" element={<OrderDetailPage />} />
                   <Route path="/ProductReview" element={<ProductReviewPage />} />
-
+                  <Route path="/HomeReport" element={<HomeReportPage />} />
+                  <Route path="/OrderReport" element={<OrderReportPage />} />
+                  <Route path="/ProductReport" element={<ProductReportPage />} />
+                  <Route path="/Supplier" element={<SupplierPage />} />
+                  <Route path="/Category" element={<CategoryPage />} />
                 </Route>
               ) : (
                 <Route path="/" element={<UserLayout />}>

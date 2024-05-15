@@ -16,8 +16,12 @@ import { NavLink } from "react-router-dom";
 import { Modal } from 'antd';
 import LoginPage from '../../page/login/LoginPage';
 import icon from "../../images/icon.png"
+import { SearchBar } from './component/SearchBar';
+import { SearchResultsList } from './component/SearchResultsList';
 import "../../css/demo3.min.css"
 const UserLayout = () => {
+    const [results, setResults] = useState([]);
+    const [isShowResults, setIsShowResults] = useState(false);
     const [isSticky, setIsSticky] = useState(false);
     const [isCart, setIsCart] = useState(false);
     const [isUser, setUser] = useState(false);
@@ -126,12 +130,14 @@ const UserLayout = () => {
                                         <img src={logo} alt="logo" width="153" height="44" />
                                     </a>
                                     <div class="header-search hs-simple">
-                                        <form action="#" class="input-wrapper">
+                                        {/* <form action="#" class="input-wrapper">
                                             <input type="text" class="form-control" name="search" autocomplete="off" placeholder="Search..." required />
                                             <button class="btn btn-search" type="submit" title="submit-button">
                                                 <FontAwesomeIcon icon={faSearch} />
                                             </button>
-                                        </form>
+                                        </form> */}
+                                        <SearchBar setResults={setResults} setIsShowResults={setIsShowResults} />
+                                        {isShowResults ? (results && results.length > 0 && <SearchResultsList results={results} setResults={setResults} />) : ""}
                                     </div>
                                 </div>
                                 <div class="header-right">

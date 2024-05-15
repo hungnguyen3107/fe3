@@ -67,7 +67,7 @@ const ProductModal = () => {
     return (
         <>
             <Button type="primary" onClick={showModal}>
-                Open Modal
+                Thêm mới
             </Button>
             <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={1000}>
                 <Tabs defaultActiveKey={activeTab} centered onChange={handleTabChange}>

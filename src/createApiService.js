@@ -34,15 +34,12 @@ const _makeAuthRequest = (instantAxios) => async (args) => {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refresh_token");
     const client_id = localStorage.getItem("client_id");
-
     const headers = {
         Authorization: `Bearer ${token}`,
         ClientID: client_id,
     };
-
     let isRefreshing = false;
     const failedQueue = [];
-
     const processQueue = (error, token = null) => {
         failedQueue.forEach(prom => {
             if (error) {
@@ -54,7 +51,6 @@ const _makeAuthRequest = (instantAxios) => async (args) => {
 
         failedQueue = [];
     };
-
     instantAxios.interceptors.response.use(
         (response) => {
             return response;
@@ -75,10 +71,8 @@ const _makeAuthRequest = (instantAxios) => async (args) => {
                             return Promise.reject(err);
                         });
                 }
-
                 originalRequest._retry = true;
                 isRefreshing = true;
-
                 return new Promise(function (resolve, reject) {
                     axios({
                         method: "POST",

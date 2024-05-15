@@ -4992,7 +4992,7 @@ table tr th {
     font-size: calc(13px + (16 - 13) * ((100vw - 320px) / (1920 - 320)));
     color: #232323;
     text-align: center;
-    min-width: 180px;
+    min-width: 152px;
     background-color: #f8f8f9;
     padding: 15px 20px
 }

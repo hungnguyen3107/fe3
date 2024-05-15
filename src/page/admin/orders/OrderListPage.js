@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useProductContext } from '../../../services/helpers/getDataHelpers';
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
+import {
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    SyncOutlined,
+    CloseCircleOutlined
+} from '@ant-design/icons';
+import { Tag, Popconfirm } from 'antd';
 const OrderListPage = () => {
     const { order, handleChangeStatus } = useProductContext();
     const navigate = useNavigate()
@@ -73,34 +83,52 @@ const OrderListPage = () => {
 
                                                         <td data-field="number">{items.order.phoneNumber}</td>
 
-                                                        <td data-field="date">Jul 20, 2021</td>
+                                                        <td data-field="date">{new Date(items.order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</td>
                                                         {
                                                             items.order.isPay == 2 ?
                                                                 <td data-field="text">Tiền mặt</td> : items.order.isPay == 1 ? <td data-field="text">Paypal</td> : ""
                                                         }
                                                         {items.order.status === 1 ? (
-                                                            <td class="order-success" onClick={() => handleChangeStatus(items.id)}>
-                                                                <span>Xác nhận</span>
+                                                            <td onClick={() => handleChangeStatus(items.id)}>
+                                                                <Tag icon={<ClockCircleOutlined />} color="default">
+                                                                    Xác nhận
+                                                                </Tag>
                                                             </td>
                                                         ) : items.order.status === 2 ? (
-                                                            <td class="order-success" onClick={() => handleChangeStatus(items.id)}>
-                                                                <span>Đang vận chuyển</span>
+                                                            <td onClick={() => handleChangeStatus(items.id)}>
+                                                                <Tag icon={<SyncOutlined spin />} color="processing">
+                                                                    Đang vận chuyển
+                                                                </Tag>
+                                                            </td>
+                                                        ) : items.order.status === 3 ? (
+                                                            <td >
+                                                                <Tag icon={<CheckCircleOutlined />} color="success">
+                                                                    Hoàn thành
+                                                                </Tag>
                                                             </td>
                                                         ) : (
-                                                            <td class="order-success">
-                                                                <span>Hoàn thành</span>
+                                                            <td >
+                                                                <Tag icon={<CloseCircleOutlined />} color="error">
+                                                                    Đã hủy
+                                                                </Tag>
                                                             </td>
-                                                        )}
+                                                        )
+                                                        }
                                                         <td data-field="number">{items.order.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
 
                                                         <td>
-                                                            <a href="javascript:void(0)" onClick={() => handleClickDetailOrder(items.id)} >
-                                                                <i class="fa fa-edit" title="Edit"></i>
-                                                            </a>
 
-                                                            <a href="javascript:void(0)">
-                                                                <i class="fa fa-trash" title="Delete"></i>
-                                                            </a>
+                                                            <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} onClick={() => handleClickDetailOrder(items.id)} />
+                                                            {
+                                                                items.order.status === 4 ? "" : (<Popconfirm
+                                                                    title="Hủy sản phẩm này?"
+                                                                    onConfirm={() => handleChangeStatus(items.id)}
+                                                                    okText="Có"
+                                                                    cancelText="Không"
+                                                                >
+                                                                    <FontAwesomeIcon icon={faTrash} />
+                                                                </Popconfirm>)
+                                                            }
                                                         </td>
                                                     </tr>
                                                 ))

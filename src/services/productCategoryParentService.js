@@ -13,8 +13,23 @@ const create = (data) => {
         data: data,
     });
 };
+const deleteCategoryParent = (params) => {
+    return api.makeAuthRequest({
+        url: `/api/ProductCategoryParent`,
+        method: "DELETE",
+        params: params
+    });
+};
+const updateCategoryParent = (Id, data) => {
+    return api.makeAuthRequest({
+        url: `/api/ProductCategoryParent?Id=${Id}`,
+        method: "PUT",
+        data: data
+    });
+};
 export const productCategoryParentServices = {
     get,
-    create
-
+    create,
+    deleteCategoryParent,
+    updateCategoryParent
 };
