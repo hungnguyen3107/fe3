@@ -24,23 +24,20 @@ const LayoutProfile = () => {
             </nav>
             <div class="page-content mt-4 mb-10 pb-6">
                 <div class="container">
-                    <h2 class="title title-center mb-10">My Account</h2>
+                    <h2 class="title title-center mb-10">Tài khoản</h2>
                     <div class="tab tab-vertical gutter-lg">
                         <ul class="nav nav-tabs mb-4 col-lg-3 col-md-4" role="tablist" style={{ width: "27.8%" }}>
                             <li class="nav-item">
-                                <NavLink to="/dashboard" className="nav-link " style={{ cursor: "pointer" }} >Dashboard</NavLink>
+                                <NavLink to="/dashboard" className="nav-link " style={{ cursor: "pointer" }} >Trang chủ</NavLink>
                             </li>
                             <li class="nav-item">
-                                <NavLink to="/dashboard/historyOrder" className="nav-link" style={{ cursor: "pointer" }} >Orders</NavLink>
+                                <NavLink to="/dashboard/historyOrder" className="nav-link" style={{ cursor: "pointer" }} >Lịch sử mua hàng</NavLink>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#address">Address</a>
-                            </li>
-                            <li class="nav-item">
-                                <NavLink to="/dashboard/profile" className="nav-link" style={{ cursor: "pointer" }} >Account details</NavLink>
+                                <NavLink to="/dashboard/profile" className="nav-link" style={{ cursor: "pointer" }} >Chi tiết tài khoản</NavLink>
                             </li>
                             <li class="nav-item" onClick={logout}>
-                                <a class="nav-link" >Logout</a>
+                                <a class="nav-link" >Đăng xuất</a>
                             </li>
                         </ul>
                         <div className="tab-content col-lg-9 col-md-8">

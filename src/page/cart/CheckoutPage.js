@@ -64,11 +64,11 @@ const CheckoutPage = () => {
                             productId: item.productId[0].id
                         }))
                     };
-                    console.log(payload);
-                    await orderServices.create(payload);
+                    const res = await orderServices.create(payload);
+                    console.log(res);
                     message.success("Thanh toán thành công");
                     sessionStorage.removeItem("products");
-                    navigate("/orderSuccess");
+                    navigate(`/orderSuccess/${res.orderId}`);
                 } catch (error) {
                     console.error(error);
                     message.error("Thanh toán thất bại");
@@ -100,7 +100,7 @@ const CheckoutPage = () => {
                     console.log(payload);
                     const res = await vnPayServices.create(payload);
                     // message.success("Thanh toán thành công");
-                    // sessionStorage.removeItem("products");
+                    sessionStorage.removeItem("products");
                     window.location.href = res.redirectUrl;
                 } catch (error) {
                     console.error(error);
@@ -114,9 +114,9 @@ const CheckoutPage = () => {
         <main class="main checkout">
             <div class="page-content pt-7 pb-10 mb-10">
                 <div class="step-by pr-4 pl-4">
-                    <h3 class="title title-simple title-step"><a href="cart.html">1. Shopping Cart</a></h3>
-                    <h3 class="title title-simple title-step active"><a href="checkout.html">2. Checkout</a></h3>
-                    <h3 class="title title-simple title-step"><a href="order.html">3. Order Complete</a></h3>
+                    <h3 class="title title-simple title-step"><a href="cart.html">1. Giỏ hàng</a></h3>
+                    <h3 class="title title-simple title-step active"><a href="checkout.html">2. Kiểm tra</a></h3>
+                    <h3 class="title title-simple title-step"><a href="order.html">3. Hoàn thành</a></h3>
                 </div>
                 <div class="container mt-7">
 
@@ -134,10 +134,10 @@ const CheckoutPage = () => {
                     <form class="form" onSubmit={formik.handleSubmit}>
                         <div class="row">
                             <div class="col-lg-7 mb-6 mb-lg-0 pr-lg-4">
-                                <h3 class="title title-simple text-left text-uppercase">Billing Details</h3>
+                                <h3 class="title title-simple text-left text-uppercase">Chi tiết thanh toán</h3>
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <label>First Name *</label>
+                                        <label>Họ *</label>
                                         <input
                                             type="text"
                                             class="form-control"
@@ -147,7 +147,7 @@ const CheckoutPage = () => {
                                         />
                                     </div>
                                     <div class="col-xs-6">
-                                        <label>Last Name *</label>
+                                        <label>Tên *</label>
                                         <input
                                             type="text"
                                             class="form-control"
@@ -157,14 +157,14 @@ const CheckoutPage = () => {
                                         />
                                     </div>
                                 </div>
-                                <label>Street Address *</label>
+                                <label>Địa chỉ nhà,tên đường *</label>
                                 <input
                                     type="text"
                                     class="form-control"
                                     value={formik.values.address}
                                     onChange={formik.handleChange}
                                     name="address" required
-                                    placeholder="House number and street name" />
+                                    placeholder="Số nhà và tên đường" />
                                 <select
                                     id="province"
                                     className="form-control"
@@ -178,7 +178,7 @@ const CheckoutPage = () => {
                                         <option key={index} value={item.id}>{item.name}</option>
                                     ))}
                                 </select>
-                                <label>District</label>
+                                <label>Quận,Huyện</label>
                                 <select
                                     id="district"
                                     className="form-control"
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
                                         <option key={index} value={item.id}>{item.name}</option>
                                     ))}
                                 </select>
-                                <label>Ward</label>
+                                <label>Xã,phường</label>
                                 <select
                                     id="ward"
                                     className="form-control"
@@ -208,7 +208,7 @@ const CheckoutPage = () => {
                                 </select>
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <label>Email Address *</label>
+                                        <label>Email *</label>
                                         <input
                                             type="email"
                                             class="form-control"
@@ -218,7 +218,7 @@ const CheckoutPage = () => {
                                         />
                                     </div>
                                     <div class="col-xs-6">
-                                        <label>Phone *</label>
+                                        <label>SĐT *</label>
                                         <input
                                             type="text"
                                             class="form-control"
@@ -228,23 +228,13 @@ const CheckoutPage = () => {
                                         />
                                     </div>
                                 </div>
-                                <div class="form-checkbox mb-0">
-                                    <input type="checkbox" class="custom-checkbox" id="create-account" name="create-account" />
-                                    <label class="form-control-label ls-s" for="create-account">Create an
-                                        account?</label>
-                                </div>
-                                <div class="form-checkbox mb-6">
-                                    <input type="checkbox" class="custom-checkbox" id="different-address" name="different-address" />
-                                    <label class="form-control-label ls-s" for="different-address">Ship to a different
-                                        address?</label>
-                                </div>
-                                <h2 class="title title-simple text-uppercase text-left">Additional Information</h2>
-                                <label>Order Notes (Optional)</label>
+                                <h2 class="title title-simple text-uppercase text-left">Thông tin thêm</h2>
+                                <label>Ghi chú</label>
                                 <textarea
                                     class="form-control pb-2 pt-2 mb-0"
                                     cols="30" rows="5"
                                     name="note"
-                                    placeholder="Notes about your order, e.g. special notes for delivery"
+                                    placeholder="Ghi chú về đơn đặt hàng của bạn, ví dụ: ghi chú đặc biệt khi giao hàng"
                                     value={formik.values.note}
                                     onChange={formik.handleChange}
                                 ></textarea>
@@ -252,11 +242,11 @@ const CheckoutPage = () => {
                             <aside class="col-lg-5 sticky-sidebar-wrapper">
                                 <div class="sticky-sidebar mt-1" data-sticky-options="{'bottom': 50}">
                                     <div class="summary pt-5">
-                                        <h3 class="title title-simple text-left text-uppercase">Your Order</h3>
+                                        <h3 class="title title-simple text-left text-uppercase">Đơn hàng</h3>
                                         <table class="order-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Product</th>
+                                                    <th>Sản phẩm</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -269,35 +259,9 @@ const CheckoutPage = () => {
                                                         </tr>
                                                     ))
                                                 }
-                                                <tr class="sumnary-shipping shipping-row-last">
-                                                    <td colspan="2">
-                                                        <h4 class="summary-subtitle">Calculate Shipping</h4>
-                                                        <ul>
-                                                            <li>
-                                                                <div class="custom-radio">
-                                                                    <input type="radio" id="flat_rate" name="shipping" class="custom-control-input" checked />
-                                                                    <label class="custom-control-label" for="flat_rate">Flat rate</label>
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div class="custom-radio">
-                                                                    <input type="radio" id="free-shipping" name="shipping" class="custom-control-input" />
-                                                                    <label class="custom-control-label" for="free-shipping">Free
-                                                                        shipping</label>
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div class="custom-radio">
-                                                                    <input type="radio" id="local_pickup" name="shipping" class="custom-control-input" />
-                                                                    <label class="custom-control-label" for="local_pickup">Local pickup</label>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
                                                 <tr class="summary-total">
                                                     <td class="pb-0">
-                                                        <h4 class="summary-subtitle">Total</h4>
+                                                        <h4 class="summary-subtitle">Tổng</h4>
                                                     </td>
                                                     <td class=" pt-0 pb-0">
                                                         <p class="summary-total-price ls-s text-primary">{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
@@ -306,7 +270,7 @@ const CheckoutPage = () => {
                                             </tbody>
                                         </table>
                                         <div className="payment accordion radio-type">
-                                            <h4 className="summary-subtitle ls-m pb-3">Payment Methods</h4>
+                                            <h4 className="summary-subtitle ls-m pb-3">Phương thức thanh toán</h4>
                                             <div class="card" style={{ border: "none" }}>
                                                 <div class="card-header">
                                                     <input
@@ -317,7 +281,7 @@ const CheckoutPage = () => {
                                                         onChange={handlePaymentChange}
                                                         checked={paymentMethod === 1}
                                                     />
-                                                    <label for="test2" style={{ color: "#666", fontSize: "1.4rem", lineHeight: "3rem" }}>Paypal</label>
+                                                    <label for="test2" style={{ color: "#666", fontSize: "1.4rem", lineHeight: "3rem" }}>VnPay</label>
                                                 </div>
                                                 <div id="collapse1" class="expanded" style={{ display: "none" }}>
                                                     <div class="card-body ls-m">
@@ -345,15 +309,8 @@ const CheckoutPage = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-checkbox mt-4 mb-5">
-                                            <input type="checkbox" class="custom-checkbox" id="terms-condition" name="terms-condition" />
-                                            <label class="form-control-label" for="terms-condition">
-                                                I have read and agree to the website <a href="#">terms and conditions
-                                                </a>*
-                                            </label>
-                                        </div>
-                                        <button type="submit" class="btn btn-dark btn-rounded btn-order" style={{ padding: "1.22em 2.78em", fontWeight: "700", fontSize: "1.4rem" }}>Place
-                                            Order</button>
+
+                                        <button type="submit" class="btn btn-dark btn-rounded btn-order" style={{ padding: "1.22em 2.78em", fontWeight: "700", fontSize: "1.4rem" }}>Đặt hàng</button>
                                     </div>
                                 </div>
                             </aside>

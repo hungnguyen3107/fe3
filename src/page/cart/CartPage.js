@@ -49,9 +49,9 @@ const CartPage = () => {
         <main class="main cart">
             <div class="page-content pt-7 pb-10">
                 <div class="step-by pr-4 pl-4">
-                    <h3 class="title title-simple title-step active"><a href="cart.html">1. Shopping Cart</a></h3>
-                    <h3 class="title title-simple title-step"><a href="checkout.html">2. Checkout</a></h3>
-                    <h3 class="title title-simple title-step"><a href="order.html">3. Order Complete</a></h3>
+                    <h3 class="title title-simple title-step active"><a href="cart.html">1. GIỎ HÀNG</a></h3>
+                    <h3 class="title title-simple title-step"><a href="checkout.html">2. KIỂM TRA</a></h3>
+                    <h3 class="title title-simple title-step"><a href="order.html">3. HOÀN THÀNH</a></h3>
                 </div>
                 <div class="container mt-7 mb-2">
                     <div class="row">
@@ -59,11 +59,11 @@ const CartPage = () => {
                             <table class="shop-table cart-table">
                                 <thead>
                                     <tr>
-                                        <th><span>Product</span></th>
+                                        <th><span>Tên sản phẩm</span></th>
                                         <th></th>
-                                        <th><span>Price</span></th>
-                                        <th><span>quantity</span></th>
-                                        <th>Subtotal</th>
+                                        <th><span>Giá</span></th>
+                                        <th><span>Số lượng</span></th>
+                                        <th>Thành tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -73,7 +73,7 @@ const CartPage = () => {
                                                 <td class="product-thumbnail">
                                                     <figure>
                                                         <a href="product-simple.html">
-                                                            <img src={`https://localhost:7285/Images/${items.productId[0].image[0]}`} width="100" height="100" alt="product" />
+                                                            <img src={`https://192.168.243.125:7285/Images/${items.productId[0].image[0]}`} width="100" height="100" alt="product" />
                                                         </a>
                                                     </figure>
                                                 </td>
@@ -106,17 +106,17 @@ const CartPage = () => {
                                 </tbody>
                             </table>
                             <div class="cart-actions mb-6 pt-4">
-                                <a class="btn btn-dark btn-md btn-rounded btn-icon-left mr-4 mb-4" style={{ fontWeight: "700" }}><NavLink to="/"><FontAwesomeIcon icon={faArrowLeft} style={{ marginRight: "0.8rem", fontSize: "2rem" }} />Continue Shopping </NavLink></a>
+                                <a class="btn btn-dark btn-md btn-rounded btn-icon-left mr-4 mb-4" style={{ fontWeight: "700" }}><NavLink to="/"><FontAwesomeIcon icon={faArrowLeft} style={{ marginRight: "0.8rem", fontSize: "2rem" }} />Tiếp tục mua sắm </NavLink></a>
                             </div>
                         </div>
                         <aside class="col-lg-4 sticky-sidebar-wrapper">
                             <div class="sticky-sidebar" data-sticky-options="{'bottom': 20}">
                                 <div class="summary mb-4">
-                                    <h3 class="summary-title text-left">Cart Totals</h3>
+                                    <h3 class="summary-title text-left">TỔNG GIỎ HÀNG</h3>
                                     <table class="total">
                                         <tr class="summary-subtotal">
                                             <td>
-                                                <h4 class="summary-subtitle">Total</h4>
+                                                <h4 class="summary-subtitle">Tổng</h4>
                                             </td>
                                             <td>
                                                 <p class="summary-total-price ls-s">{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
@@ -126,11 +126,11 @@ const CartPage = () => {
                                     {
                                         dataUser ? (<>
                                             <NavLink to="/checkout" className="btn btn-dark btn-rounded btn-checkout" style={{ fontWeight: "700", fontSize: "1.3rem" }}>
-                                                Proceed to checkout
+                                                Tiến hành kiểm tra
                                             </NavLink>
                                         </>) : (<>
                                             <NavLink onClick={showModal} className="btn btn-dark btn-rounded btn-checkout" style={{ fontWeight: "700", fontSize: "1.3rem" }}>
-                                                Proceed to checkout
+                                                Tiến hành kiểm tra
                                             </NavLink>
                                         </>)
                                     }

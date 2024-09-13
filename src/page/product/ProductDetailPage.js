@@ -43,6 +43,7 @@ const ProductDetailPage = () => {
     const [dragDown, setDragDown] = useState(0);
     const [dragProduct, setDragProduct] = useState(0);
     const [isDrag, setIsDrag] = useState(false);
+    const [isStatusRating, setIsStatusRating] = useState(false);
     const productSimilarSliderRef = useRef();
     const productSimilarRef = useRef();
     const { id } = useParams();
@@ -77,7 +78,7 @@ const ProductDetailPage = () => {
             if (res) {
                 setProductId(res.items);
                 setData({
-                    image: `https://localhost:7285/Images/${res.items[0].image[0]}`,
+                    image: `https://192.168.243.125:7285/Images/${res.items[0].image[0]}`,
                     index: 0
                 })
                 setIdCategory(res.items[0].category.id);
@@ -116,6 +117,7 @@ const ProductDetailPage = () => {
             });
             setDataRating(res.items);
             setTotalCount(res.totalCount);
+            setIsStatusRating(!isStatusRating);
         } catch (error) {
             console.error(error);
         }
@@ -196,7 +198,8 @@ const ProductDetailPage = () => {
         getProductDetail();
         getCountRating();
         getProductSimilar();
-    }, [currentPage, rowsPerPage, idCategory, id])
+    }, [currentPage, rowsPerPage, idCategory, id, isStatusRating])
+
     useEffect(() => {
         JSON.parse(sessionStorage.getItem('products'))
     }, [isDataCart])
@@ -278,9 +281,9 @@ scroll-behavior: smooth;
                                     {productId.map((item, index) => (
                                         <div class="product-thumbs" key={index} style={{ border: data.image === item.image ? '1px solid blue' : '' }}>
                                             {item.image.map((imageItem, imageIndex) => (
-                                                <div key={imageIndex} onClick={() => setData({ image: `https://localhost:7285/Images/${imageItem}`, index: imageIndex })}>
+                                                <div key={imageIndex} onClick={() => setData({ image: `https://192.168.243.125:7285/Images/${imageItem}`, index: imageIndex })}>
                                                     <div class="product-thumb">
-                                                        <img src={`https://localhost:7285/Images/${imageItem}`} alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
+                                                        <img src={`https://192.168.243.125:7285/Images/${imageItem}`} alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
                                                     </div>
                                                 </div>
                                             ))}
@@ -298,16 +301,22 @@ scroll-behavior: smooth;
                                         <div class="product-navigation">
                                             <ul class="breadcrumb breadcrumb-lg">
                                                 <li><NavLink to="/"><FontAwesomeIcon icon={faHome} /></NavLink></li>
-                                                <li><a href="#" class="active">Products</a></li>
-                                                <li>Detail</li>
+                                                <li><a href="#" class="active">Sản phẩm</a></li>
+                                                <li>Chi tiết</li>
                                             </ul>
                                         </div>
                                         <h1 class="product-name">{items.name}</h1>
                                         <div class="product-meta">
                                             SKU:<span class="product-sku">{items.id}</span>
-                                            CATEGORIES:<span class="product-brand">{items.category.name}</span>
+                                            LOẠI SẢN PHẨM:<span class="product-brand">{items.category.name}</span>
                                         </div>
-                                        <div class="product-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+                                        <div class="product-price">
+                                            <ins class="new-price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins>
+                                            {
+                                                items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
+                                            }
+
+                                        </div>
                                         <div class="ratings-container">
                                             <div class="comment-rating ratings-container">
 
@@ -340,7 +349,7 @@ scroll-behavior: smooth;
                                                         <FontAwesomeIcon icon={faPlus} />
                                                     </button>
                                                 </div>
-                                                <button class="btn-product btn-cart text-normal ls-normal font-weight-semi-bold" onClick={() => handleAddToCart(items.id)}><FontAwesomeIcon style={{ marginRight: "6px" }} icon={faCartPlus} />Add to Cart</button>
+                                                <button class="btn-product btn-cart text-normal ls-normal font-weight-semi-bold" onClick={() => handleAddToCart(items.id)}><FontAwesomeIcon style={{ marginRight: "6px" }} icon={faCartPlus} />Thêm vào giỏ hàng</button>
                                             </div>
                                         </div>
                                         <hr class="product-divider mb-3" />
@@ -362,7 +371,7 @@ scroll-behavior: smooth;
                         </div>
                         <div class="tab tab-nav-simple product-tabs mb-5">
                             <Tabs >
-                                <TabPane tab="Description" key="Description">
+                                <TabPane tab="Mô tả" key="Description">
                                     <div class="tab-pane active in mb-3" id="product-tab-description">
                                         <div class="">
                                             <div class="">
@@ -375,14 +384,14 @@ scroll-behavior: smooth;
                                         </div>
                                     </div>
                                 </TabPane>
-                                <TabPane tab="Reviews" key="Reviews">
+                                <TabPane tab="Đánh giá" key="Reviews">
                                     <div class="tab-pane active in" id="product-tab-reviews">
                                         <div class="row">
                                             <div class="col-lg-4 mb-6">
                                                 <div class="avg-rating-container">
                                                     <mark>5.0</mark>
                                                     <div class="avg-rating">
-                                                        <span class="avg-rating-title">Average Rating</span>
+                                                        <span class="avg-rating-title">Sao trung bình</span>
                                                         <div class="ratings-container mb-0">
 
                                                             <div class="comment-rating ratings-container">
@@ -492,38 +501,10 @@ scroll-behavior: smooth;
                                                         <div class="progress-value">0%</div>
                                                     </div> */}
                                                 </div>
-                                                <a class="btn btn-dark btn-rounded submit-review-toggle" style={{ padding: "1.22em 2.78em", fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleClickRating}>Submit
-                                                    Review</a>
+                                                <a class="btn btn-dark btn-rounded submit-review-toggle" style={{ padding: "1.22em 2.78em", fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleClickRating}> Gửi đánh giá</a>
                                             </div>
                                             <div class="col-lg-8 comments pt-2 pb-10 border-no">
-                                                <nav class="toolbox">
-                                                    <div class="toolbox-left">
-                                                        <div class="toolbox-item">
-                                                            <a href="#" class="btn btn-outline btn-rounded">All Reviews</a>
-                                                        </div>
-                                                        <div class="toolbox-item">
-                                                            <a href="#" class="btn btn-outline btn-rounded">With Images</a>
-                                                        </div>
-                                                        <div class="toolbox-item">
-                                                            <a href="#" class="btn btn-outline btn-rounded">With Videos</a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="toolbox-right">
-                                                        <div class="toolbox-item toolbox-sort select-box text-dark">
-                                                            <label>Sort By :</label>
-                                                            <select name="orderby" class="form-control" fdprocessedid="y6cvg">
-                                                                <option value="">Default Order</option>
-                                                                <option value="newest" selected="selected">Newest Reviews
-                                                                </option>
-                                                                <option value="oldest">Oldest Reviews</option>
-                                                                <option value="high_rate">Highest Rating</option>
-                                                                <option value="low_rate">Lowest Rating</option>
-                                                                <option value="most_likely">Most Likely</option>
-                                                                <option value="most_unlikely">Most Unlikely</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </nav>
+
                                                 <ul class="comments-list" style={{ display: "grid" }}>
                                                     {
                                                         dataRating.map((items, index) => (
@@ -537,7 +518,7 @@ scroll-behavior: smooth;
                                                                                 </a>
                                                                             </>) : (<>
                                                                                 <a >
-                                                                                    <img src={`https://localhost:7285/Images/${items.user.avatar}`} alt="avatar" />
+                                                                                    <img src={`https://192.168.243.125:7285/Images/${items.user.avatar}`} alt="avatar" />
                                                                                 </a>
                                                                             </>)
                                                                         }
@@ -554,7 +535,7 @@ scroll-behavior: smooth;
                                                                             ))}
                                                                         </div>
                                                                         <div class="comment-user">
-                                                                            <span class="comment-date">by <span class="font-weight-semi-bold text-uppercase text-dark">{items.user.firstName} {items.user.lastName}</span> on
+                                                                            <span class="comment-date">by <span class="font-weight-semi-bold text-uppercase text-dark">{items.user.email}</span> on
                                                                                 <span class="font-weight-semi-bold text-dark">{new Date(items.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></span>
                                                                         </div>
                                                                         <div class="comment-content mb-5">
@@ -592,13 +573,13 @@ scroll-behavior: smooth;
                                             <div class="review-overlay" onClick={handleClickRating}></div>
                                             <div class="review-form-wrapper">
                                                 <div class="title-wrapper text-left">
-                                                    <h3 class="title title-simple text-left text-normal">Add a Review</h3>
-                                                    <p>Your email address will not be published. Required fields are marked *
+                                                    <h3 class="title title-simple text-left text-normal">Thêm đánh giá</h3>
+                                                    <p>Địa chỉ email của bạn sẽ không được công bố. Các trường bắt buộc được đánh dấu *
                                                     </p>
                                                 </div>
                                                 <form onSubmit={handleSubmit}>
                                                     <div className="rating-form">
-                                                        <label htmlFor="rating" className="text-dark">Your rating * </label>
+                                                        <label htmlFor="rating" className="text-dark">Số sao của bạn * </label>
                                                         <span className="rating-stars selected">
                                                             {[1, 2, 3, 4, 5].map((value) => (
                                                                 <FontAwesomeIcon
@@ -629,7 +610,7 @@ scroll-behavior: smooth;
                                                                 }}
                                                                 className="btn btn-primary btn-rounded"
                                                             >
-                                                                Submit<FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: "5px" }} />
+                                                                Gửi<FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: "5px" }} />
                                                             </button>
                                                         </>) : (<>
                                                             <button
@@ -639,7 +620,7 @@ scroll-behavior: smooth;
                                                                 onClick={showModal}
                                                                 className="btn btn-primary btn-rounded"
                                                             >
-                                                                Submit<FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: "5px" }} />
+                                                                Gửi<FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: "5px" }} />
                                                             </button>
                                                         </>)
                                                     }
@@ -661,7 +642,7 @@ scroll-behavior: smooth;
 
                         </div>
                         <section class="related-product mt-10">
-                            <h2 class="title title-center mb-1 ls-normal">Related Products</h2>
+                            <h2 class="title title-center mb-1 ls-normal">Sản phẩm tương tự</h2>
                             <div class="owl-carousel owl-theme owl-nav-full row cols-2 cols-md-3 cols-lg-4">
                                 <ProductsRowContainer draggable='false'>
                                     <ProductSlider
@@ -676,7 +657,7 @@ scroll-behavior: smooth;
                                                 <div class="product text-center" key={index} ref={productSimilarRef} onClick={() => handleClickDetail(items.id)}>
                                                     <figure class="product-media">
                                                         <a style={{ cursor: "pointer" }}>
-                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
+                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
                                                         </a>
                                                         <div class="product-label-group">
                                                             <label class="product-label label-new">new</label>

@@ -89,20 +89,17 @@ const ProductReviewPage = () => {
                                         <table class="review-table table all-package">
                                             <thead>
                                                 <tr>
-                                                    <th>No.</th>
-                                                    <th>Customer Name</th>
-                                                    <th>Product Name</th>
-                                                    <th>Rating</th>
-                                                    <th>Comment</th>
-                                                    <th>Published</th>
+                                                    <th>Email</th>
+                                                    <th>Tên sản phẩm</th>
+                                                    <th>Số sao</th>
+                                                    <th>Bình luận</th>
+                                                    <th>Thao tác</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {
                                                     dataRating.map((items, index) => (
                                                         <tr key={index}>
-
-                                                            <td>01</td>
                                                             <td>{items.user.email}</td>
                                                             <td>{items.nameProduct}</td>
                                                             <td>

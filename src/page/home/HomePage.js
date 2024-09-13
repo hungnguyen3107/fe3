@@ -22,12 +22,14 @@ import { useNavigate } from "react-router-dom";
 import { productServices } from '../../services/productService';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useCartContext } from '../../services/helpers/getDataCartHelper';
+import { Pagination } from 'antd';
+import { orderServices } from '../../services/orderService';
 const HomePage = () => {
-    const { product, handleClickDetail, categoryParent } = useProductContext();
+    const { product, handleClickDetail, categoryParent, totalCount, rowsPerPage, setRowsPerpage, currentPage, setCurrentPage } = useProductContext();
     const { handleAddToCart } = useCartContext();
     const [saleProduct, setSaleProduct] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerpage] = useState(8);
+    const [newProduct, setNewProduct] = useState([]);
+    const [hotProduct, setHotProduct] = useState([]);
     const navigate = useNavigate()
     const handleOnclickCategoryParent = async (id) => {
         try {
@@ -53,8 +55,39 @@ const HomePage = () => {
             console.error(error);
         }
     }
+    //lấy ra sản phẩm mới
+    const getNewProduct = async () => {
+        try {
+            const res = await productServices.get({
+                "Limit": 1,
+                "PageIndex": 6
+            });
+            if (res) {
+                setNewProduct(res.items);
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //sản phẩm bán chạy 
+    const getHotProduct = async () => {
+        try {
+            const res = await orderServices.getReportProduct(
+                {
+                    "Limit": currentPage,
+                    "PageIndex": rowsPerPage,
+                }
+            );
+            setHotProduct(res.reportOrderProducts);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     useEffect(() => {
         getSaleProduct();
+        getNewProduct();
+        getHotProduct();
     }, [])
     return (
         <>
@@ -70,7 +103,7 @@ const HomePage = () => {
                                 <div class="sidebar-content">
                                     <div class="sticky-sidebar">
                                         <ul class="menu vertical-menu category-menu mb-4">
-                                            <li ><a href="demo3-shop.html" class="menu-title">Popular Categories</a></li>
+                                            <li ><a href="demo3-shop.html" class="menu-title">Danh mục sản phẩm</a></li>
                                             {
                                                 categoryParent.map((items, index) => (
                                                     <li key={index} style={{ width: "100%" }}> <a onClick={() => handleOnclickCategoryParent(items.id)}>{items.name}</a></li>
@@ -95,7 +128,7 @@ const HomePage = () => {
                                         <div class="widget widget-products border-no" data-animation-options="{
                                         'delay': '.3s'
                                     }">
-                                            <h4 class="widget-title font-weight-bold">Popular Products</h4>
+                                            <h4 class="widget-title font-weight-bold">Sản phẩm mới</h4>
                                             <div class="widget-body">
                                                 <div class="owl-carousel owl-nav-top" data-owl-options="{
                                                 'items': 1,
@@ -105,268 +138,34 @@ const HomePage = () => {
                                                 'margin': 20
                                             }">
                                                     <div class="products-col">
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/10.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Hand Electric Cell</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <span class="price">$26.00</span>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
+                                                        {
+                                                            newProduct.map((items, index) => (
+                                                                <div class="product product-list-sm" key={index}>
+                                                                    <figure class="product-media">
+                                                                        <a style={{ cursor: "pointer" }}>
+                                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                        </a>
+                                                                    </figure>
+                                                                    <div class="product-details">
+                                                                        <h3 class="product-name">
+                                                                            <a onClick={() => handleClickDetail(items.id)} style={{ cursor: 'pointer' }}>{items.name}</a>
+                                                                        </h3>
+                                                                        <div class="product-price">
+                                                                            <ins class="new-price">{items.promotionPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</ins>
+                                                                            {
+                                                                                items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
+                                                                            }
+                                                                        </div>
                                                                     </div>
+
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/11.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Men's Fashion Hood</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <span class="price">$39.00</span>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/12.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Women's Fashion Jeans
-                                                                        Clothing</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <ins class="new-price">$199.00</ins><del class="old-price">$210.00</del>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="products-col">
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/10.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Fashion Hiking Hat</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <span class="price">$39.00</span>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/11.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Men's Fashion Hood</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <span class="price">$19.00</span>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product product-list-sm">
-                                                            <figure class="product-media">
-                                                                <a href="demo3-product.html">
-                                                                    <img src="images/demos/demo3/products/12.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                                </a>
-                                                            </figure>
-                                                            <div class="product-details">
-                                                                <h3 class="product-name">
-                                                                    <a href="demo3-product.html">Women's Fashion Jeans
-                                                                        Clothing</a>
-                                                                </h3>
-                                                                <div class="product-price">
-                                                                    <ins class="new-price">$199.00</ins><del class="old-price">$210.00</del>
-                                                                </div>
-                                                                <div class="ratings-container">
-                                                                    <div class="ratings-full">
-                                                                        <span class="ratings" style={{ width: "100%" }}
-                                                                        ></span>
-                                                                        <span class="tooltiptext tooltip-top"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                            ))
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="widget widget-blog border-no" data-animation-options="{
-                                        'delay': '.3s'
-                                    }">
-                                            <h4 class="widget-title text-capitalize font-weight-bold">Latest Blog</h4>
-                                            <div class="widget-body">
-                                                <div class="owl-carousel owl-nav-top" data-owl-options="{
-                                                'items': 1,
-                                                'loop': false,
-                                                'nav': true,
-                                                'dots': false,
-                                                'margin': 20
-                                            }">
-                                                    <div class="post overlay-dark overlay-zoom">
-                                                        <figure class="post-media">
-                                                            <a href="post-single.html">
-                                                                <img src="images/demos/demo3/blog/1.jpg" width="280" height="195" alt="post" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="post-details">
-                                                            <div class="post-meta">
-                                                                by <a href="#" class="post-author">John Doe</a>
-                                                                on <a href="#" class="post-date">Nov 22, 2018</a>
-                                                            </div>
-                                                            <h3 class="post-title"><a href="post-single.html">Explore
-                                                                Fashion Trending For
-                                                                Women</a></h3>
-                                                            <a href="post-single.html" class="btn btn-primary btn-link btn-underline btn-sm">Read
-                                                                More<i class="d-icon-arrow-right"></i></a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="post overlay-dark overlay-zoom">
-                                                        <figure class="post-media">
-                                                            <a href="post-single.html">
-                                                                <img src="images/demos/demo3/blog/2.jpg" width="280" height="195" alt="post" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="post-details">
-                                                            <div class="post-meta">
-                                                                by <a href="#" class="post-author">John Doe</a>
-                                                                on <a href="#" class="post-date">Nov 22, 2018</a>
-                                                            </div>
-                                                            <h3 class="post-title"><a href="post-single.html">Just a cool
-                                                                blog post with Images</a></h3>
-                                                            <a href="post-single.html" class="btn btn-link btn-underline btn-primary btn-sm">Read
-                                                                More<i class="d-icon-arrow-right"></i></a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="post overlay-dark overlay-zoom">
-                                                        <figure class="post-media">
-                                                            <a href="post-single.html">
-                                                                <img src="images/demos/demo3/blog/3.jpg" width="280" height="195" alt="post" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="post-details">
-                                                            <div class="post-meta">
-                                                                by <a href="#" class="post-author">John Doe</a>
-                                                                on <a href="#" class="post-date">Nov 22, 2018</a>
-                                                            </div>
-                                                            <h3 class="post-title"><a href="post-single.html">Just a cool
-                                                                blog post with Images</a></h3>
-                                                            <a href="post-single.html" class="btn btn-link btn-underline btn-primary btn-sm">Read
-                                                                More<i class="d-icon-arrow-right"></i></a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="post overlay-dark overlay-zoom">
-                                                        <figure class="post-media">
-                                                            <a href="post-single.html">
-                                                                <img src="images/demos/demo3/blog/4.jpg" width="280" height="195" alt="post" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="post-details">
-                                                            <div class="post-meta">
-                                                                by <a href="#" class="post-author">John Doe</a>
-                                                                on <a href="#" class="post-date">Nov 22, 2018</a>
-                                                            </div>
-                                                            <h3 class="post-title"><a href="post-single.html">Just a cool
-                                                                blog post with Images</a></h3>
-                                                            <a href="post-single.html" class="btn btn-link btn-underline btn-primary btn-sm">Read
-                                                                More<i class="d-icon-arrow-right"></i></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="widget widget-testimonial border-no" data-animation-options="{
-                                        'delay': '.3s'
-                                    }">
-                                            <h4 class="widget-title text-capitalize font-weight-bold">Testimonials</h4>
-                                            <div class="widget-body">
-                                                <div class="owl-carousel owl-nav-top" data-owl-options="{
-                                                'items': 1,
-                                                'loop': false,
-                                                'nav': true,
-                                                'dots': false,
-                                                'margin': 20
-                                            }">
-                                                    <div class="testimonial">
-                                                        <blockquote class="comment">I am keeping my fingers on the pulse by
-                                                            Riode every year! It gives me good sense of trend. My family
-                                                            likes it, too.</blockquote>
-                                                        <div class="testimonial-info">
-                                                            <figure class="testimonial-author-thumbnail">
-                                                                <img src="images/demos/demo3/agent.png" alt="user" width="40" height="40" />
-                                                            </figure>
-                                                            <cite class="font-weight-semi-bold text-capitalize">
-                                                                Casper Dalin
-                                                                <span>Investor</span>
-                                                            </cite>
-                                                        </div>
-                                                    </div>
-                                                    <div class="testimonial">
-                                                        <blockquote class="comment">I am keeping my fingers on the pulse by
-                                                            Riode every year! It gives me good sense of trend. My family
-                                                            likes it, too.</blockquote>
-                                                        <div class="testimonial-info">
-                                                            <figure class="testimonial-author-thumbnail">
-                                                                <img src="images/demos/demo3/agent.png" alt="user" width="40" height="40" />
-                                                            </figure>
-                                                            <cite>
-                                                                Casper Dalin
-                                                                <span>Investor</span>
-                                                            </cite>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             </aside>
@@ -381,6 +180,7 @@ const HomePage = () => {
                                 }">
                                         <Carousel >
                                             <div>
+
                                                 <div className="banner banner-fixed intro-slide1">
                                                     <img src={slider1} alt="intro-banner" width="880" height="474" style={{ backgroundColor: "#ffc74e" }} />
                                                     <div className="banner-content">
@@ -457,18 +257,18 @@ const HomePage = () => {
                                 <section class="product-wrapper mb-8">
                                     <h2 class="title title-line title-underline with-link appear-animate" data-animation-options="{
                                     'delay': '.3s'
-                                }" style={{ visibility: "visible", opacity: 1 }}>Featured Product
+                                }" style={{ visibility: "visible", opacity: 1 }}>Sản phẩm
                                         <a href="#" class="font-weight-semi-bold">View more<FontAwesomeIcon style={{ marginLeft: "5px" }} icon={faArrowRight} /></a></h2>
                                     <div class="row gutter-xs appear-animate" data-animation-options="{
                                     'delay': '.3s'
                                 }" style={{ visibility: "visible", opacity: 1 }}>
                                         {
-                                            product.slice(0, 8).map((items, index) => (
+                                            product.map((items, index) => (
                                                 <div class="col-md-3 col-6 mb-4" key={index}>
                                                     <div class="product text-center">
                                                         <figure class="product-media">
                                                             <a style={{ cursor: "pointer" }}>
-                                                                <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
                                                             </a>
                                                             <div class="product-label-group">
                                                                 <label class="product-label label-new">new</label>
@@ -498,20 +298,32 @@ const HomePage = () => {
                                                                     items.isStatus == 1 ? (<del class="old-price">{items.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</del>) : ""
                                                                 }
                                                             </div>
-                                                            {/* <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "60%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
-                                                                </div>
-                                                            </div> */}
+
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))
                                         }
                                     </div>
+                                    <nav class="toolbox toolbox-pagination">
+                                        <Pagination
+                                            current={currentPage}
+                                            pageSize={rowsPerPage}
+                                            defaultPageSize={rowsPerPage}
+                                            showSizeChanger={true}
+                                            pageSizeOptions={["10", "20", "30", '100']}
+                                            total={totalCount}
+                                            locale={{ items_per_page: "/ trang" }}
+                                            showTotal={(total, range) => <span>Tổng số: {total}</span>}
+                                            onShowSizeChange={(current, pageSize) => {
+                                                setCurrentPage(current);
+                                                setRowsPerpage(pageSize);
+                                            }}
+                                            onChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                        />
+                                    </nav>
                                 </section>
-                                <section class="banner banner-cta mb-7 text-center" style={{ backgroundImage: "url('images/demos/demo3/banner.jpg')", backgroundColor: "#c5d1d2" }}>
+                                <section class="banner banner-cta mb-7 text-center" style={{ backgroundImage: "url('images/banner22.jpg')", backgroundColor: "#c5d1d2" }}>
                                     <div class="banner-content w-100 ">
                                         <h4 class="banner-subtitle font-weight-bold ls-s text-white text-uppercase">Coming
                                             soon</h4>
@@ -529,14 +341,14 @@ const HomePage = () => {
                                     <div class="row">
                                         <div class="col-md-4 col-sm-6 mb-4">
                                             <div class="widget widget-products ">
-                                                <h4 class="widget-title font-weight-bold">Sale Products</h4>
+                                                <h4 class="widget-title font-weight-bold">Sản phẩm giảm giá</h4>
                                                 <div class="products-col">
                                                     {
-                                                        saleProduct.map((items, index) => (
+                                                        saleProduct.slice(0, 3).map((items, index) => (
                                                             <div class="product product-list-sm" key={index}>
                                                                 <figure class="product-media">
                                                                     <a href="demo3-product.html">
-                                                                        <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                        <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
                                                                     </a>
                                                                 </figure>
                                                                 <div class="product-details">
@@ -561,7 +373,7 @@ const HomePage = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-sm-6 mb-4 ">
+                                        {/* <div class="col-md-4 col-sm-6 mb-4 ">
                                             <div class="widget widget-products ">
                                                 <h4 class="widget-title font-weight-bold">Latest Products</h4>
                                                 <div class="products-col">
@@ -631,76 +443,35 @@ const HomePage = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div class="col-md-4 col-sm-6 mb-4">
                                             <div class="widget widget-products ">
-                                                <h4 class="widget-title font-weight-bold">Best of the Week</h4>
-                                                <div class="products-col">
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/15.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Blue Sports Shoes</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <span class="price">$36.00</span>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "20%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
+                                                <h4 class="widget-title font-weight-bold">sản phẩm bán chạy</h4>
+                                                {
+                                                    hotProduct.slice(0, 3).map((items, index) => (
+                                                        <div class="product product-list-sm" key={index}>
+                                                            <figure class="product-media">
+                                                                <a href="demo3-product.html">
+                                                                    <img src={`https://192.168.243.125:7285/Images/${items.product.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                </a>
+                                                            </figure>
+                                                            <div class="product-details">
+                                                                <h3 class="product-name">
+                                                                    <a >{items.product.name}</a>
+                                                                </h3>
+                                                                <div class="product-price">
+                                                                    <span class="price">{items.product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                </div>
+                                                                <div class="ratings-container">
+                                                                    <div class="ratings-full">
+                                                                        <span class="ratings" style={{ width: "40%" }}></span>
+                                                                        <span class="tooltiptext tooltip-top"></span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/16.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Fashion Handbag</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <ins class="new-price">$53.99</ins><del class="old-price">$67.99</del>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "100%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="product product-list-sm">
-                                                        <figure class="product-media">
-                                                            <a href="demo3-product.html">
-                                                                <img src="images/demos/demo3/products/17.jpg" alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
-                                                            </a>
-                                                        </figure>
-                                                        <div class="product-details">
-                                                            <h3 class="product-name">
-                                                                <a href="demo3-product.html">Women’s Beautiful
-                                                                    Headgear</a>
-                                                            </h3>
-                                                            <div class="product-price">
-                                                                <span class="price">$82.23</span>
-                                                            </div>
-                                                            <div class="ratings-container">
-                                                                <div class="ratings-full">
-                                                                    <span class="ratings" style={{ width: "600%" }}></span>
-                                                                    <span class="tooltiptext tooltip-top"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                    ))
+                                                }
                                             </div>
                                         </div>
                                     </div>

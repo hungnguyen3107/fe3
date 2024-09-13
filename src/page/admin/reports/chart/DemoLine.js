@@ -32,7 +32,7 @@ const DemoLine = ({ year }) => {
 
     useEffect(() => {
         totalRevenueByMonth();
-    }, [year, currentPage, rowsPerPage]);
+    }, [year]);
 
     const data = monthlyRevenue.map((item, index) => ({ tháng: `${index + 1}`, value: item }));
 

@@ -1,8 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supplierServices } from '../../../../services/supplierService'
 import { Form, Input, Button, message } from 'antd'
-const SupplierModal = ({ onFinish }) => {
+const SupplierModal = ({ curData, getSupplier, isStatusModal }) => {
     const [form] = Form.useForm();
+    useEffect(() => {
+        if (curData) {
+            form.setFieldsValue({
+                Name: curData?.name ? curData?.name : "",
+                Email: curData?.email ? curData?.email : "",
+                Adress: curData?.adress ? curData?.adress : "",
+                Phone: curData?.phone ? curData?.phone : ""
+            })
+        }
+    }, [curData, form])
+    // thêm sản phẩm
+    const onFinish = async (values) => {
+        if (isStatusModal === "Add") {
+
+            const res = await supplierServices.create(values)
+            if (res) {
+                message.success("Thêm nhà cung cấp thành công!")
+                await getSupplier();
+            } else {
+                message.error(res.error)
+            }
+        } else {
+            const res = await supplierServices.updateSupplier(curData.id, values)
+            if (res) {
+                await getSupplier();
+                message.success("Chỉnh sửa nhà cung cấp thành công!")
+            } else {
+                message.error(res.error)
+            }
+        }
+
+    }
     return (
         <Form
             layout="vertical"
@@ -58,7 +90,7 @@ const SupplierModal = ({ onFinish }) => {
                         <Form.Item
                             style={{ marginBottom: "4px" }}
                             // label={"Số lượng"}
-                            name="Email"
+                            name="Adress"
                             rules={[
                                 {
                                     required: true,
@@ -77,7 +109,7 @@ const SupplierModal = ({ onFinish }) => {
                         <Form.Item
                             style={{ marginBottom: "4px" }}
 
-                            name="PhoneNumber"
+                            name="Phone"
                             rules={[
                                 {
                                     required: true,

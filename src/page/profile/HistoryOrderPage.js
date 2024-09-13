@@ -31,6 +31,7 @@ const HistoryOrderPage = () => {
             const res = await orderServices.getId({ Order_id: id });
             if (res) {
                 setHistoryDetailOrder(res.items);
+                setIsOrder(!isOrder);
             }
         } catch (error) {
             console.error(error);
@@ -54,11 +55,11 @@ const HistoryOrderPage = () => {
             <table className="order-table" style={{ fontFamily: "Poppins, sans-serif", fontSize: "1.4rem" }}>
                 <thead>
                     <tr>
-                        <th className="pl-2">Order</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Total</th>
-                        <th className="pr-2">Actions</th>
+                        <th className="pl-2">STT</th>
+                        <th>Ngày</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng </th>
+                        <th className="pr-2">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +67,7 @@ const HistoryOrderPage = () => {
                         historyOrder.map((items, index) => (
                             <tr key={index}>
                                 <td className="order-number"><a href="#">{index + 1}</a></td>
-                                <td className="order-date"><span>February 24, 2021</span></td>
+                                <td className="order-date"><span>{new Date(items.order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</span></td>
                                 {items.order.status === 1 ? (
                                     <td >
                                         <Tag icon={<ClockCircleOutlined />} color="default">
@@ -94,7 +95,7 @@ const HistoryOrderPage = () => {
                                 )}
 
                                 <td className="order-total"><span>{items.order.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></td>
-                                <td className="order-action"><a className="  btn-link btn-underline" style={{ display: "inline-block", marginBottom: "2rem", padding: 0, textDecoration: "none" }} onClick={handleClickOrder}>View</a></td>
+                                <td className="order-action"><a className="  btn-link btn-underline" style={{ display: "inline-block", marginBottom: "2rem", padding: 0, textDecoration: "none" }} onClick={() => getHistoryDetailOrder(items.id)}>Xem chi tiết</a></td>
                             </tr>
                         ))
                     }
@@ -103,7 +104,7 @@ const HistoryOrderPage = () => {
             <div class={`dropdown cart-dropdown type2 off-canvas mr-0 mr-lg-2 ${isOrder ? "opened" : ""}`}>
                 <a class="cart-toggle label-block link" >
                     <div class="cart-label d-lg-show">
-                        <span class="cart-name">Shopping Cart:</span>
+                        {/* <span class="cart-name">Sản phẩm:</span> */}
                         {/* <span class="cart-price">{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span> */}
                     </div>
 
@@ -113,7 +114,7 @@ const HistoryOrderPage = () => {
 
                 <div class="dropdown-box">
                     <div class="canvas-header">
-                        <h4 class="canvas-title">Shopping Cart</h4>
+                        <h4 class="canvas-title">Sản phẩm</h4>
                         <a class="btn btn-dark btn-link btn-icon-right btn-close" onClick={handleClickOrder}>close<span class="sr-only">Cart</span></a>
                     </div>
                     <div class="products scrollable">
@@ -121,7 +122,7 @@ const HistoryOrderPage = () => {
                             <div class="product product-cart" key={index}>
                                 <figure class="product-media">
                                     <a >
-                                        <img src={`https://localhost:7285/Images/${items.orderItems.image[0]}`} alt="product" width="80" height="88" />
+                                        <img src={`https://192.168.243.125:7285/Images/${items.orderItems.image[0]}`} alt="product" width="80" height="88" />
                                     </a>
                                 </figure>
                                 <div class="product-detail">
@@ -135,13 +136,13 @@ const HistoryOrderPage = () => {
                         ))}
                     </div>
                     <div class="cart-total">
-                        <label>Subtotal:</label>
+                        <label>Tổng tiền:</label>
                         <span class="price">{totalOrderPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                     </div>
 
-                    <div class="cart-action">
+                    {/* <div class="cart-action">
                         <a href="checkout.html" class="btn btn-dark"><span>Go To Checkout</span></a>
-                    </div>
+                    </div> */}
 
                 </div>
 

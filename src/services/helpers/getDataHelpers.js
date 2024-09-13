@@ -11,6 +11,7 @@ import { postDetailBlog } from '../blogService';
 import { productCategoryParentServices } from '../productCategoryParentService';
 import { useNavigate } from "react-router-dom";
 import { message } from 'antd';
+
 const ProductContext = createContext();
 export const useProductContext = () => useContext(ProductContext);
 export const ProductProvider = ({ children }) => {
@@ -30,6 +31,7 @@ export const ProductProvider = ({ children }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerpage] = useState(8);
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -72,7 +74,12 @@ export const ProductProvider = ({ children }) => {
     //lấy dữ liệu đơn hàng
     const getOrder = async () => {
         try {
-            const res = await orderServices.get();
+            const res = await orderServices.get(
+                {
+                    "Limit": currentPage,
+                    "PageIndex": rowsPerPage,
+                }
+            );
             setOrder(res.items);
         } catch (error) {
             console.error(error);
@@ -167,9 +174,9 @@ export const ProductProvider = ({ children }) => {
         getProduct();
         getOrder();
         getProductCategory();
-    }, [isChangeStatus]);
+    }, [isChangeStatus, currentPage, rowsPerPage,]);
     return (
-        <ProductContext.Provider value={{ dataBlodDetail, handleClickBlog, productId, totalCount, categoryParent, isModalOpen, order, category, supplier, province, district, ward, product, handleOnclickId, getSupplier, getCategory, getProductCategory, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus, getProduct }}>
+        <ProductContext.Provider value={{ rowsPerPage, setRowsPerpage, currentPage, setCurrentPage, dataBlodDetail, handleClickBlog, productId, totalCount, categoryParent, isModalOpen, order, category, supplier, province, district, ward, product, handleOnclickId, getSupplier, getCategory, getProductCategory, handleClickDetail, handleOk, handleCancel, showModal, handleChangeStatus, getProduct }}>
             {children}
         </ProductContext.Provider>
     );

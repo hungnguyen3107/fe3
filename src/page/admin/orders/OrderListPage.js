@@ -10,10 +10,22 @@ import {
     SyncOutlined,
     CloseCircleOutlined
 } from '@ant-design/icons';
-import { Tag, Popconfirm } from 'antd';
+import { Tag, Popconfirm, Radio } from 'antd';
+
 const OrderListPage = () => {
     const { order, handleChangeStatus } = useProductContext();
-    const navigate = useNavigate()
+    const [tabPosition, setTabPosition] = useState(1);
+    const changeTabPosition = (e) => {
+        setTabPosition(e.target.value);
+    };
+    const navigate = useNavigate();
+    const [filteredOrders, setFilteredOrders] = useState([]);
+    console.log()
+    useEffect(() => {
+        // Lọc dữ liệu dựa trên trạng thái được chọn
+        const filtered = order.filter(order => order.order.status === tabPosition);
+        setFilteredOrders(filtered);
+    }, [tabPosition, order]);
     const handleClickDetailOrder = async (id) => {
         try {
             navigate(`${id}`)
@@ -21,6 +33,7 @@ const OrderListPage = () => {
             console.error(error);
         }
     }
+
     return (
         <div class="page-body">
             <div class="container-fluid">
@@ -57,30 +70,41 @@ const OrderListPage = () => {
                                         <input class="form-control-plaintext" type="search" placeholder="Search.." />
                                     </div>
                                 </form>
+                                <Radio.Group value={tabPosition} onChange={changeTabPosition}>
+                                    <Radio.Button value={1}>Chưa xác nhận</Radio.Button>
+                                    <Radio.Button value={2}>đang giao hàng</Radio.Button>
+                                    <Radio.Button value={3}>Hoàn thành</Radio.Button>
+                                    <Radio.Button value={4}>Đã hủy</Radio.Button>
+                                    <Radio.Button value={5}>Hoàn tiền một phần </Radio.Button>
+                                    <Radio.Button value={6}>Đã hoàn tiền </Radio.Button>
+                                </Radio.Group>
                             </div>
+
                             <div class="card-body">
                                 <div class="table-responsive table-desi">
                                     <table class="table all-package" id="editableTable">
                                         <thead>
                                             <tr>
-                                                <th>Order Image</th>
-                                                <th>Order Code</th>
-                                                <th>Date</th>
-                                                <th>Payment Method</th>
-                                                <th>Delivery Status</th>
-                                                <th>Amount</th>
-                                                <th>Option</th>
+                                                <th>Họ tên</th>
+                                                <th>Email</th>
+                                                <th>SĐT</th>
+                                                <th>Ngày đặt</th>
+                                                <th>Thanh toán</th>
+                                                <th>Trạng thái</th>
+                                                <th>Tổng tiền</th>
+                                                <th>Thao tác</th>
                                             </tr>
                                         </thead>
 
                                         <tbody>
                                             {
-                                                order.map((items, index) => (
+                                                filteredOrders.map((items, index) => (
                                                     <tr key={index}>
-                                                        <td>
-                                                            <img src="assets/images/dashboard/product/1.jpg" alt="users" />
+                                                        <td data-field="text">
+                                                            {items.order.firstName}<br />
+                                                            {items.order.lastName}
                                                         </td>
-
+                                                        <td data-field="text">{items.order.email}</td>
                                                         <td data-field="number">{items.order.phoneNumber}</td>
 
                                                         <td data-field="date">{new Date(items.order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</td>
@@ -106,10 +130,22 @@ const OrderListPage = () => {
                                                                     Hoàn thành
                                                                 </Tag>
                                                             </td>
-                                                        ) : (
+                                                        ) : items.order.status === 4 ? (
                                                             <td >
                                                                 <Tag icon={<CloseCircleOutlined />} color="error">
                                                                     Đã hủy
+                                                                </Tag>
+                                                            </td>
+                                                        ) : items.order.status === 5 ? (
+                                                            <td >
+                                                                <Tag icon={<CloseCircleOutlined />} color="error">
+                                                                    Hoàn trả 1 phần
+                                                                </Tag>
+                                                            </td>
+                                                        ) : (
+                                                            <td >
+                                                                <Tag icon={<CloseCircleOutlined />} color="error">
+                                                                    Hoàn trả toàn bộ
                                                                 </Tag>
                                                             </td>
                                                         )
@@ -120,14 +156,16 @@ const OrderListPage = () => {
 
                                                             <FontAwesomeIcon icon={faPenToSquare} style={{ paddingRight: "6px" }} onClick={() => handleClickDetailOrder(items.id)} />
                                                             {
-                                                                items.order.status === 4 ? "" : (<Popconfirm
-                                                                    title="Hủy sản phẩm này?"
-                                                                    onConfirm={() => handleChangeStatus(items.id)}
-                                                                    okText="Có"
-                                                                    cancelText="Không"
-                                                                >
-                                                                    <FontAwesomeIcon icon={faTrash} />
-                                                                </Popconfirm>)
+                                                                [3, 4, 5, 6].includes(items.order.status) ? "" : (
+                                                                    <Popconfirm
+                                                                        title="Hủy sản phẩm này?"
+                                                                        onConfirm={() => handleChangeStatus(items.id)}
+                                                                        okText="Có"
+                                                                        cancelText="Không"
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faTrash} />
+                                                                    </Popconfirm>
+                                                                )
                                                             }
                                                         </td>
                                                     </tr>

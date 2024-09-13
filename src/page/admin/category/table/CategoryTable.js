@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
-import { faAdd } from '@fortawesome/free-solid-svg-icons/faAdd';
 import { Pagination, Popconfirm, message, Modal, Table, Button } from 'antd';
 import { categoryServices } from '../../../../services/categoryService';
 import CategoryModal from '../modal/CategoryModal';
@@ -41,10 +40,10 @@ const CategoryTable = ({ CategoryParent_id }) => {
         }
     }
     //xóa loại sản phẩm
-    const handleDeleteCategory = (id) => {
-        const res = categoryServices.deleteCategory({ "id": id })
+    const handleDeleteCategory = async (id) => {
+        const res = await categoryServices.deleteCategory({ "id": id })
         if (res) {
-            getCategory();
+            await getCategory();
             message.success("xóa loại sản phẩm thành công!")
         } else {
             message.error(res.error)

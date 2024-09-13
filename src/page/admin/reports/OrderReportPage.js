@@ -20,6 +20,8 @@ const options = [
     { value: 2, label: 'Đang giao hàng ' },
     { value: 3, label: 'Đã giao hàng' },
     { value: 4, label: 'Đã hủy hàng' },
+    { value: 5, label: 'Hoàn tiền một phần' },
+    { value: 6, label: 'Đã hoàn tiền' },
 ];
 
 const OrderReportPage = () => {
@@ -123,7 +125,6 @@ const OrderReportPage = () => {
                                         <table class="review-table table all-package" ref={tableRef}>
                                             <thead>
                                                 <tr>
-                                                    <th></th>
                                                     <th>Thời gian</th>
                                                     <th>Trạng thái</th>
                                                     <th>Số lượng sản phẩm</th>
@@ -135,8 +136,7 @@ const OrderReportPage = () => {
                                             <tbody>
                                                 {
                                                     orderStatus.map((items, index) => (
-                                                        <tr key={index}>
-                                                            <td data-field="text">{index + 1}</td>
+                                                        <tr key={index}>                                                           
 
                                                             <td data-field="date">{new Date(items.order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</td>
 
@@ -158,10 +158,22 @@ const OrderReportPage = () => {
                                                                         Đã giao hàng
                                                                     </Tag>
                                                                 </td>
-                                                            ) : (
+                                                            ) : items.order.status === 4 ? (
                                                                 <td >
                                                                     <Tag icon={<CloseCircleOutlined />} color="error">
                                                                         Đã hủy Hàng
+                                                                    </Tag>
+                                                                </td>
+                                                            ) : items.order.status === 5 ? (
+                                                                <td >
+                                                                    <Tag icon={<CloseCircleOutlined />} color="error">
+                                                                        Đã trả một phần
+                                                                    </Tag>
+                                                                </td>
+                                                            ) : (
+                                                                <td >
+                                                                    <Tag icon={<CloseCircleOutlined />} color="error">
+                                                                        Đã trả toàn bộ
                                                                     </Tag>
                                                                 </td>
                                                             )

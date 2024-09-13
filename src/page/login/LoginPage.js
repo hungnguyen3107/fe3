@@ -20,16 +20,16 @@ const LoginPage = () => {
         validationSchema: activeTab === "register" ?
             Yup.object({
                 Email: Yup.string()
-                    .required("Required")
+                    .required("Vui lòng điền vào trường này ! ")
                     .matches(
                         /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                        "Please enter a valid email address"
+                        "Vui lòng nhập địa chỉ email hợp lệ !"
                     ),
                 Password: Yup.string()
-                    .required("Required")
+                    .required("Vui lòng điền vào trường này !")
                     .matches(
                         /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d][A-Za-z\d!@#$%^&*()_+]{7,19}$/,
-                        "Password must be 7-19 characters and contain at least one letter, one number and a special character"
+                        "Mật khẩu phải có 7-19 ký tự và chứa ít nhất một chữ cái, một số và một ký tự đặc biệt"
                     )
             }) : undefined,
         onSubmit: async (values) => {
@@ -45,7 +45,7 @@ const LoginPage = () => {
                     console.log(formData);
                 } catch (error) {
                     console.error(error);
-                    message.error("thêm mới thất bại");
+                    // message.error("thêm mới thất bại");
                 }
             } else {
                 try {
@@ -72,7 +72,7 @@ const LoginPage = () => {
     });
     return (
         <Tabs defaultActiveKey={activeTab} centered onChange={handleTabChange}>
-            <TabPane tab="Login" key="signin">
+            <TabPane tab="Đăng nhập" key="signin">
                 <form className="infoform" onSubmit={formik.handleSubmit}>
                     <div className="form-group mb-3">
                         <input
@@ -105,7 +105,7 @@ const LoginPage = () => {
                         </div>
                         <a href="#" className="lost-link">Lost your password?</a>
                     </div>
-                    <button className="btn btn-dark btn-block btn-rounded" type="submit">Login</button>
+                    <button className="btn btn-dark btn-block btn-rounded" type="submit">Đăng nhập</button>
                 </form>
                 <div className="form-choice text-center">
                     <label className="ls-m">or Login With</label>
@@ -116,7 +116,7 @@ const LoginPage = () => {
                     </div>
                 </div>
             </TabPane>
-            <TabPane tab="Register" key="register">
+            <TabPane tab="Đăng ký" key="register">
 
                 <form className="infoform" onSubmit={formik.handleSubmit}>
 
@@ -151,7 +151,7 @@ const LoginPage = () => {
                         <p className="errorMsg"> {formik.errors.Password} </p>
                     )}
 
-                    <button className="btn btn-dark btn-block btn-rounded" type="submit"> Register </button>
+                    <button className="btn btn-dark btn-block btn-rounded" type="submit"> Đăng ký </button>
                 </form>
                 <div className="form-choice text-center">
                     <label className="ls-m">or Register With</label>

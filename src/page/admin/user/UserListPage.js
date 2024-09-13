@@ -89,7 +89,7 @@ const UserListPage = () => {
                             borderColor: "#ff4c3b",
                             color: "#fff",
                             textDecoration: "none"
-                        }}>Create User</NavLink>
+                        }}>Thêm mới</NavLink>
                     </div>
 
                     <div class="card-body">
@@ -97,13 +97,13 @@ const UserListPage = () => {
                             <table class="all-package coupon-table table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Avtar</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
+                                        <th>Ảnh</th>
+                                        <th>Họ</th>
+                                        <th>Tên</th>
                                         <th>Email</th>
-                                        <th>Phone Number</th>
-                                        <th>Role</th>
-                                        <th>Option</th>
+                                        <th>SĐT</th>
+                                        <th>Quyền</th>
+                                        <th>Thao tác</th>
                                     </tr>
                                 </thead>
 
@@ -116,7 +116,7 @@ const UserListPage = () => {
                                             }}>
 
                                                 <td>
-                                                    <img src={items.avatar} alt="" />
+                                                    <img src={`https://192.168.243.125:7285/Images/${items.avatar}`} alt="" />
                                                 </td>
 
                                                 <td>{items.firstName}</td>

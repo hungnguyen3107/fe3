@@ -66,7 +66,18 @@ const ProductModal = () => {
     };
     return (
         <>
-            <Button type="primary" onClick={showModal}>
+            <Button style={{
+                padding: "0.6rem 1.75rem",
+                borderRadius: "5px",
+                fontWeight: 700,
+                fontSize: "14px",
+                lineHeight: "20px",
+                textTransform: "uppercase",
+                backgroundColor: "#ff4c3b",
+                borderColor: "#ff4c3b",
+                color: "#fff",
+                textDecoration: "none"
+            }} onClick={showModal}>
                 Thêm mới
             </Button>
             <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={1000}>

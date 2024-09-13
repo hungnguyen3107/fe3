@@ -18,6 +18,7 @@ import LoginPage from '../../page/login/LoginPage';
 import icon from "../../images/icon.png"
 import { SearchBar } from './component/SearchBar';
 import { SearchResultsList } from './component/SearchResultsList';
+import { useProductContext } from '../../services/helpers/getDataHelpers';
 import "../../css/demo3.min.css"
 const UserLayout = () => {
     const [results, setResults] = useState([]);
@@ -27,7 +28,9 @@ const UserLayout = () => {
     const [isUser, setUser] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { dataProducts, calculateTotalQuantity, calculateTotalPrice, isDataCart, handleRemoveItem } = useCartContext();
+    const { handleClickDetail } = useProductContext();
     const user = JSON.parse(sessionStorage.getItem("user"));
+
     const handleClickUser = () => {
         setUser(!isUser);
     }
@@ -102,10 +105,10 @@ const UserLayout = () => {
                                         <>
                                             <a className="login-toggle link-to-tab d-md-show" onClick={showModal}>
                                                 <FontAwesomeIcon icon={faUser} style={{ marginRight: "0.9rem" }} />
-                                                Sign in
+                                                Đăng nhập
                                             </a>
                                             <span className="delimiter">/</span>
-                                            <a href="#register" className="register-toggle link-to-tab d-md-show ml-0">Register</a>
+                                            <a href="#register" className="register-toggle link-to-tab d-md-show ml-0">Đăng kí</a>
                                         </>
                                     ) : (
                                         ""
@@ -137,7 +140,7 @@ const UserLayout = () => {
                                             </button>
                                         </form> */}
                                         <SearchBar setResults={setResults} setIsShowResults={setIsShowResults} />
-                                        {isShowResults ? (results && results.length > 0 && <SearchResultsList results={results} setResults={setResults} />) : ""}
+                                        {isShowResults ? (results && results.length > 0 && <SearchResultsList results={results} setResults={setResults} handleClick={handleClickDetail} />) : ""}
                                     </div>
                                 </div>
                                 <div class="header-right">
@@ -156,7 +159,7 @@ const UserLayout = () => {
                                             user ? (<>
                                                 <a class="wishlist-toggle" title="wishlist" onClick={handleClickUser}>
                                                     {
-                                                        user.avatar ? (<><img src={`https://localhost:7285/Images/${user.avatar}`} width={28} height={28} /></>) : (<><img src={icon} width={28} height={28} /></>)
+                                                        user.avatar ? (<><img src={`https://192.168.243.125:7285/Images/${user.avatar}`} width={28} height={28} /></>) : (<><img src={icon} width={28} height={28} /></>)
                                                     }
 
                                                 </a>
@@ -229,7 +232,7 @@ const UserLayout = () => {
                                     <div class={`dropdown cart-dropdown type2 off-canvas mr-0 mr-lg-2 ${isCart ? "opened" : ""}`}>
                                         <a class="cart-toggle label-block link" onClick={handleClickCart}>
                                             <div class="cart-label d-lg-show">
-                                                <span class="cart-name">Shopping Cart:</span>
+                                                <span class="cart-name">Giỏ hàng:</span>
                                                 <span class="cart-price">{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                             </div>
 
@@ -239,7 +242,7 @@ const UserLayout = () => {
 
                                         <div class="dropdown-box">
                                             <div class="canvas-header">
-                                                <h4 class="canvas-title">Shopping Cart</h4>
+                                                <h4 class="canvas-title">Giỏ hàng</h4>
                                                 <a class="btn btn-dark btn-link btn-icon-right btn-close" onClick={handleClickCart}>close<FontAwesomeIcon icon={faArrowRight} /><span class="sr-only">Cart</span></a>
                                             </div>
                                             <div class="products scrollable">
@@ -247,7 +250,7 @@ const UserLayout = () => {
                                                     <div class="product product-cart" key={index}>
                                                         <figure class="product-media">
                                                             <a >
-                                                                <img src={`https://localhost:7285/Images/${items.productId[0].image[0]}`} alt="product" width="80" height="88" />
+                                                                <img src={`https://192.168.243.125:7285/Images/${items.productId[0].image[0]}`} alt="product" width="80" height="88" />
                                                             </a>
                                                             <button class="btn btn-link btn-close" onClick={() => handleRemoveItem(items.productId[0].id)}>
                                                                 <i class="fas fa-times"></i><span class="sr-only">Close</span>
@@ -271,8 +274,8 @@ const UserLayout = () => {
                                             <div class="cart-action">
                                                 <NavLink to="/cart" class="btn btn-dark btn-link"
                                                     style={{ display: "inline-block", marginBottom: "2rem", borderBottom: "2px solid #26c", padding: 0 }}
-                                                >View Cart</NavLink>
-                                                <a href="checkout.html" class="btn btn-dark"><span>Go To Checkout</span></a>
+                                                >Xem giỏ hàng</NavLink>
+                                                <a href="checkout.html" class="btn btn-dark"><span>Đến kiểm tra</span></a>
                                             </div>
 
                                         </div>
@@ -299,15 +302,15 @@ const UserLayout = () => {
                                     <nav class="main-nav">
                                         <ul class="menu">
                                             <li class="active">
-                                                <NavLink to="/">Home</NavLink>
+                                                <NavLink to="/">Trang chủ</NavLink>
                                             </li>
                                             {
                                                 user ? (<>
                                                     <li class="submenu">
-                                                        <a href="#">Pages</a>
+                                                        <a href="#">Trang</a>
                                                         <ul>
-                                                            <li style={{ display: "block" }}><NavLink to="/contact" >Contact Us</NavLink></li>
-                                                            <li style={{ display: "block" }}><NavLink to="/dashboard" style={{ cursor: "pointer" }}>My Account</NavLink></li>
+                                                            <li style={{ display: "block" }}><NavLink to="/contact" >Giới thiệu</NavLink></li>
+                                                            <li style={{ display: "block" }}><NavLink to="/dashboard" style={{ cursor: "pointer" }}>Tài khoản </NavLink></li>
 
                                                         </ul>
                                                     </li>
@@ -315,21 +318,17 @@ const UserLayout = () => {
 
                                             }
                                             <li>
-                                                <a >Blog</a>
+                                                <a >Tin tức</a>
                                                 <ul>
                                                     <li><NavLink to="/Blog" >Tin tức sản phẩm</NavLink></li>
                                                     <li><NavLink >Tư vấn hướng dẫn</NavLink></li>
                                                 </ul>
                                             </li>
                                             <li>
-                                                <a href="about-us.html">About Us</a>
+                                                <a href="about-us.html">Về chúng tôi</a>
                                             </li>
                                         </ul>
                                     </nav>
-                                </div>
-                                <div class="header-right">
-                                    <a href="#">Limited Time Offer</a>
-                                    <a href="https://d-themes.com/buynow/riodehtml" class="ml-6">Buy Riode!</a>
                                 </div>
                             </div>
                         </div>
@@ -348,8 +347,8 @@ const UserLayout = () => {
                                     <div class="col-lg-9">
                                         <div class="widget widget-newsletter form-wrapper form-wrapper-inline">
                                             <div class="newsletter-info mx-auto mr-lg-2 ml-lg-4">
-                                                <h4 class="widget-title">Subscribe to our Newsletter</h4>
-                                                <p>Get all the latest information, Sales and Offers.</p>
+                                                <h4 class="widget-title">Theo dõi bản tin của chúng tôi</h4>
+                                                <p>Nhận tất cả các thông báo mới nhất bán hàng và ưu đãi .</p>
                                             </div>
                                             <form action="#" class="input-wrapper input-wrapper-inline">
                                                 <input type="email" class="form-control" name="email" id="newsletter_email" placeholder="Email address here..." required />
@@ -365,19 +364,19 @@ const UserLayout = () => {
                                 <div class="row">
                                     <div class="col-lg-3 col-md-6">
                                         <div class="widget widget-info">
-                                            <h4 class="widget-title">Contact Info</h4>
+                                            <h4 class="widget-title">Thông tin liên hệ</h4>
                                             <ul class="widget-body">
                                                 <li>
-                                                    <label>Phone:</label>
-                                                    <a href="tel:#">Toll Free (123) 456-7890</a>
+                                                    <label>SĐT:</label>
+                                                    <a href="tel:#">0(800) 123-456</a>
                                                 </li>
                                                 <li>
                                                     <label>Email:</label>
-                                                    <a href="https://d-themes.com/cdn-cgi/l/email-protection#d0bdb1b9bc90a2b9bfb4b5feb3bfbd"><span class="__cf_email__" data-cfemail="c2afa3abae82b0abada6a7eca1adaf">[email&#160;protected]</span></a>
+                                                    <a href="https://d-themes.com/cdn-cgi/l/email-protection#d0bdb1b9bc90a2b9bfb4b5feb3bfbd"><span class="__cf_email__" data-cfemail="c2afa3abae82b0abada6a7eca1adaf">riode@gmail.com</span></a>
                                                 </li>
                                                 <li>
-                                                    <label>Address:</label>
-                                                    <a href="#">123 Street Name, City, England</a>
+                                                    <label>Địa chỉ:</label>
+                                                    <a href="#">236,Hoàng Quốc Việt,Cầu Giấy,Hà Nội</a>
                                                 </li>
                                                 <li>
                                                     <label>WORKING DAYS / HOURS:</label>
@@ -391,23 +390,18 @@ const UserLayout = () => {
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="widget ml-lg-4">
-                                            <h4 class="widget-title">My Account</h4>
+                                            <h4 class="widget-title">Tài khoản</h4>
                                             <ul class="widget-body">
                                                 <li style={{ width: "100%" }}>
-                                                    <a href="about-us.html">About Us</a>
+                                                    <a href="about-us.html">về chúng tôi</a>
                                                 </li>
                                                 <li style={{ width: "100%" }}>
-                                                    <a href="#">Order History</a>
+                                                    <a href="#">Lịch sử mua hàng</a>
                                                 </li >
                                                 <li style={{ width: "100%" }}>
-                                                    <a href="#">Returns</a>
+                                                    <a href="#">Trả hàng</a>
                                                 </li>
-                                                <li style={{ width: "100%" }}>
-                                                    <a href="#">Custom Service</a>
-                                                </li>
-                                                <li style={{ width: "100%" }}>
-                                                    <a href="#">Terms &amp; Condition</a>
-                                                </li>
+
                                             </ul>
                                         </div>
 

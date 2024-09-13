@@ -16,20 +16,20 @@ const CategoryParentModal = ({ curData, isStatusModal, getCategoryParent }) => {
         }
     }, [curData, form])
     // thêm sản phẩm
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         if (isStatusModal === "Add") {
-            const res = productCategoryParentServices.create(values)
+            const res = await productCategoryParentServices.create(values)
             if (res) {
                 message.success("Thêm hạng mục sản phẩm thành công!")
-                getCategoryParent();
+                await getCategoryParent();
             } else {
                 message.error(res.error)
             }
         }
         else {
-            const res = productCategoryParentServices.updateCategoryParent(curData.id, values)
+            const res = await productCategoryParentServices.updateCategoryParent(curData.id, values)
             if (res) {
-                getCategoryParent();
+                await getCategoryParent();
                 message.success("Chỉnh sửa hạng mục sản phẩm thành công!")
             } else {
                 message.error(res.error)

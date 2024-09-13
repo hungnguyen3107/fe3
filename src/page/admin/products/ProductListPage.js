@@ -55,7 +55,7 @@ const ProductListPage = () => {
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="page-header-left">
-                                <h3>Product List
+                                <h3>Danh sách sản phẩm
                                     <small>Multikart Admin panel</small>
                                 </h3>
                             </div>
@@ -67,8 +67,8 @@ const ProductListPage = () => {
                                         <i data-feather="home"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item">Digital</li>
-                                <li class="breadcrumb-item active">Product List</li>
+                                <li class="breadcrumb-item">Trang chủ</li>
+                                <li class="breadcrumb-item active">Danh sách sản phẩm</li>
                             </ol>
                         </div>
                     </div>
@@ -107,8 +107,7 @@ const ProductListPage = () => {
                                         borderColor: "#ff4c3b",
                                         color: "#fff",
                                         textDecoration: "none"
-                                    }}>Add New
-                                    Product</NavLink>
+                                    }}>Thêm mới</NavLink>
                             </div>
 
                             <div class="card-body">
@@ -118,11 +117,11 @@ const ProductListPage = () => {
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Product Image</th>
-                                                <th>Product Title</th>
-                                                <th>Entry Type</th>
-                                                <th>Quantity</th>
-                                                <th>Option</th>
+                                                <th>Ảnh sản phẩm</th>
+                                                <th>Tên sản phẩm</th>
+                                                <th>Giá bán</th>
+                                                <th>Số lượng</th>
+                                                <th>Thao tác</th>
                                             </tr>
                                         </thead>
 
@@ -133,9 +132,9 @@ const ProductListPage = () => {
                                                         fontWeight: "400",
                                                         fontSize: "14px"
                                                     }}>
-                                                        <td>31</td>
+                                                        <td>{index + 1}</td>
                                                         <td>
-                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`}
+                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`}
                                                                 data-field="image" alt="" />
                                                         </td>
 

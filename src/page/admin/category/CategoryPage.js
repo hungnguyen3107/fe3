@@ -45,10 +45,10 @@ const CategoryPage = () => {
     }
 
     //xóa hạng mục sản phẩm
-    const handleDeleteCategoryParent = (id) => {
-        const res = productCategoryParentServices.deleteCategoryParent({ "id": id })
+    const handleDeleteCategoryParent = async (id) => {
+        const res = await productCategoryParentServices.deleteCategoryParent({ "id": id })
         if (res) {
-            getCategoryParent();
+            await getCategoryParent();
             message.success("xóa hạng mục sản phẩm thành công!")
         } else {
             message.error(res.error)
@@ -92,7 +92,7 @@ const CategoryPage = () => {
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="page-header-left">
-                                <h3>Product List
+                                <h3>Danh mục sản phẩm
                                     <small>Multikart Admin panel</small>
                                 </h3>
                             </div>
@@ -104,8 +104,8 @@ const CategoryPage = () => {
                                         <i data-feather="home"></i>
                                     </a>
                                 </li>
-                                <li class="breadcrumb-item">Digital</li>
-                                <li class="breadcrumb-item active">Product List</li>
+                                <li class="breadcrumb-item">Trang chủ</li>
+                                <li class="breadcrumb-item active">Danh mục sản phẩm</li>
                             </ol>
                         </div>
                     </div>

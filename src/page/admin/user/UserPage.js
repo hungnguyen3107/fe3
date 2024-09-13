@@ -12,8 +12,7 @@ const getBase64 = (file) =>
     });
 const options = [
     { value: 'Admin', label: 'Admin', emoji: '👑', desc: 'Administrator' },
-    { value: 'Nhân viên', label: 'Nhân viên', emoji: '👨‍💼', desc: 'Employee' },
-    { value: 'Quản lý', label: 'Quản lý', emoji: '👨‍💻', desc: 'Manager' },
+    { value: 'Employee', label: 'Nhân viên', emoji: '👨‍💼', desc: 'Employee' },
 ];
 const UserPage = () => {
     const [form] = Form.useForm();
@@ -215,7 +214,7 @@ const UserPage = () => {
                                                         </div>
                                                         <div class="form-group mb-3 row">
                                                             <label for="validationCustom02"
-                                                                class="col-xl-3 col-sm-4 mb-0">Last Name :</label>
+                                                                class="col-xl-3 col-sm-4 mb-0">Tên :</label>
                                                             <div class="col-xl-8 col-sm-7">
                                                                 {/* <input
                                                                     type="text"
@@ -244,7 +243,7 @@ const UserPage = () => {
                                                         </div>
                                                         <div class="form-group mb-3 row">
                                                             <label for="validationCustom02"
-                                                                class="col-xl-3 col-sm-4 mb-0">First Name :</label>
+                                                                class="col-xl-3 col-sm-4 mb-0">Họ :</label>
                                                             <div class="col-xl-8 col-sm-7">
                                                                 {/* <input
                                                                     type="text"
@@ -267,7 +266,7 @@ const UserPage = () => {
                                                                         }
                                                                     ]}
                                                                 >
-                                                                    <Input type="text" placeholder="FirstName" style={{ lineHeight: "2.5", padding: "0.48rem 0.75rem", borderRadius: "0.25rem", fontWeight: "400" }} />
+                                                                    <Input type="text" placeholder="Nhập họ " style={{ lineHeight: "2.5", padding: "0.48rem 0.75rem", borderRadius: "0.25rem", fontWeight: "400" }} />
                                                                 </Form.Item>
                                                             </div>
                                                         </div>
@@ -300,7 +299,7 @@ const UserPage = () => {
                                                                 </Form.Item>
                                                             </div>
                                                             <label for="validationCustom02"
-                                                                class="col-xl-3 col-sm-4 mb-0">Password :</label>
+                                                                class="col-xl-3 col-sm-4 mb-0">Mật khẩu :</label>
                                                             <div class="col-xl-8 col-sm-7">
                                                                 {/* <input
                                                                     type="password"
@@ -330,7 +329,7 @@ const UserPage = () => {
 
                                                         <div class="form-group mb-3 row">
                                                             <label for="validationCustom02"
-                                                                class="col-xl-3 col-sm-4 mb-0">Phone Number :</label>
+                                                                class="col-xl-3 col-sm-4 mb-0">Số điện thoại :</label>
                                                             <div class="col-xl-8 col-sm-7">
                                                                 {/* <input
                                                                     type="email"

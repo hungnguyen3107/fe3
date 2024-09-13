@@ -132,7 +132,7 @@ const ShopePage = () => {
                             <div class="sidebar-content">
                                 <div class="sticky-sidebar">
                                     <div class="widget widget-collapsible">
-                                        <h3 class="widget-title">All Categories</h3>
+                                        <h3 class="widget-title">Loại sản phẩm</h3>
                                         <ul class="widget-body filter-items search-ul">
                                             {
                                                 category.map((items, index) => (
@@ -152,7 +152,7 @@ const ShopePage = () => {
                                         </ul>
                                     </div>
                                     <div class="widget widget-collapsible">
-                                        <h3 class="widget-title">Price</h3>
+                                        <h3 class="widget-title">Giá</h3>
                                         <div class="widget-body mt-3">
                                             <form action="#">
                                                 <div class="filter-price-slider" style={{ margin: "4px 16px 3rem 9px" }}>
@@ -170,18 +170,18 @@ const ShopePage = () => {
                                                     />
                                                 </div>
                                                 <div class="filter-actions">
-                                                    <div class="filter-price-text mb-4" style={{ display: "flex" }}>Price:
+                                                    <div class="filter-price-text mb-4" style={{ display: "flex" }}>Giá:
                                                         <span class="filter-price-range" style={{ marginLeft: "5px" }}>
                                                             <div id="display2"></div>
                                                         </span>
                                                     </div>
-                                                    <button type="submit" class="btn btn-dark btn-rounded btn-filter" style={{ fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleSearchPrice}>Filter</button>
+                                                    <button type="submit" class="btn btn-dark btn-rounded btn-filter" style={{ fontWeight: "700", fontSize: "1.4rem", fontFamily: "Poppins, sans-serif" }} onClick={handleSearchPrice}>Lọc</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                     <div class="widget widget-collapsible">
-                                        <h3 class="widget-title">Supplier</h3>
+                                        <h3 class="widget-title">Nhà cung cấp</h3>
                                         <ul class="widget-body filter-items">
                                             {supplier.map((items, index) => (
                                                 <li key={index} style={{ width: "100%" }}>
@@ -214,33 +214,9 @@ const ShopePage = () => {
                             <nav class="toolbox sticky-content sticky-toolbox fix-top">
                                 <div class="toolbox-left">
                                     <a href="#" class="toolbox-item left-sidebar-toggle btn btn-sm btn-outline btn-primary btn-rounded d-lg-none">Filters<i class="d-icon-arrow-right"></i></a>
-                                    <div class="toolbox-item toolbox-sort select-box">
-                                        <label>Sort By :</label>
-                                        <select name="orderby" class="form-control">
-                                            <option value="default">Default</option>
-                                            <option value="popularity" selected="selected">Most Popular</option>
-                                            <option value="rating">Average rating</option>
-                                            <option value="date">Latest</option>
-                                            <option value="price-low">Sort forward price low</option>
-                                            <option value="price-high">Sort forward price high</option>
-                                            <option value>Clear custom sort</option>
-                                        </select>
-                                    </div>
+
                                 </div>
-                                <div class="toolbox-right">
-                                    <div class="toolbox-item toolbox-show select-box">
-                                        <label>Show :</label>
-                                        <select name="count" class="form-control">
-                                            <option value="12">12</option>
-                                            <option value="24">24</option>
-                                            <option value="36">36</option>
-                                        </select>
-                                    </div>
-                                    <div class="toolbox-item toolbox-layout">
-                                        <a href="shop-list-mode.html" class="d-icon-mode-list btn-layout"></a>
-                                        <a href="shop.html" class="d-icon-mode-grid btn-layout active"></a>
-                                    </div>
-                                </div>
+
                             </nav>
                             <div class="row cols-2 cols-sm-3 product-wrapper" >
                                 {
@@ -249,7 +225,7 @@ const ShopePage = () => {
                                             <div class="product text-center" >
                                                 <figure class="product-media">
                                                     <a >
-                                                        <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
+                                                        <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
                                                     </a>
                                                     <div class="product-label-group">
                                                         <label class="product-label label-new">new</label>

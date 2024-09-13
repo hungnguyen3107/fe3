@@ -29,11 +29,13 @@ import OrderReportPage from './page/admin/reports/OrderReportPage';
 import SupplierPage from './page/admin/supplier/SupplierPage';
 import CategoryPage from './page/admin/category/CategoryPage';
 import ProductReportPage from './page/admin/reports/ProductReportPage';
+import ReturnsModal from './page/admin/orders/modal/ReturnsModal';
+import ProductReturnPage from './page/admin/reports/ProductReturnPage';
 function App() {
   // const { roles } = useCartContext() || {};
   // console.log("role", roles)
   const rolesString = sessionStorage.getItem("roles");
-  const isAdmin = rolesString && rolesString.includes("Admin");
+  const isAdminOrEmployee = rolesString && (rolesString.includes("Admin") || rolesString.includes("Employee"));
 
   return (
     <>
@@ -41,7 +43,7 @@ function App() {
         <ProductProvider>
           <CartProvider>
             <Routes>
-              {isAdmin ? (
+              {isAdminOrEmployee ? (
                 <Route path="/" element={<AdminLayout />}>
                   <Route index element={<ProductListPage />} />
                   <Route path="/AddProduct" element={<AddProductPage />} />
@@ -58,6 +60,8 @@ function App() {
                   <Route path="/ProductReport" element={<ProductReportPage />} />
                   <Route path="/Supplier" element={<SupplierPage />} />
                   <Route path="/Category" element={<CategoryPage />} />
+                  <Route path='/ProductReturn' element={<ProductReturnPage />} />
+                  <Route path="/Returns/:id" element={<ReturnsModal />} />
                 </Route>
               ) : (
                 <Route path="/" element={<UserLayout />}>
@@ -66,7 +70,7 @@ function App() {
                   <Route path='/cart' element={<CartPage />} />
                   <Route path='/shop/:id' element={<ShopePage />} />
                   <Route path='/checkout' element={<CheckoutPage />} />
-                  <Route path='/orderSuccess' element={<OrderPage />} />
+                  <Route path='/orderSuccess/:id' element={<OrderPage />} />
                   <Route path='/profile' element={<ProfilePage />} />
                   <Route path='/dashboard' element={<LayoutProfile />} >
                     <Route path='/dashboard' element={<DashboardPage />} />

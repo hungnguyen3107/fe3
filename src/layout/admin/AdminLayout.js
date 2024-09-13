@@ -22,6 +22,8 @@ const AdminLayout = () => {
     const [isOpentSidebar, setIsOpentSidebar] = useState(false);
     const user = JSON.parse(sessionStorage.getItem("user"));
     const role = JSON.parse(sessionStorage.getItem("roles"));
+    const rolesString = sessionStorage.getItem("roles");
+    const isEmployee = rolesString && rolesString.includes("Employee");
     const navigate = useNavigate();
     const handleClickSidebar = () => {
         setIsOpentSidebar(!isOpentSidebar);
@@ -68,7 +70,7 @@ const AdminLayout = () => {
                                     <Popover placement="bottom" content={content}>
                                         <img
                                             class="align-self-center pull-right img-50 blur-up lazyloaded"
-                                            src={`https://localhost:7285/Images/${user.avatar}`} alt="header-user" style={{ width: "50px" }} />
+                                            src={`https://192.168.243.125:7285/Images/${user.avatar}`} alt="header-user" style={{ width: "50px" }} />
                                     </Popover>
 
                                     <div class="dotted-animation"><span class="animate-circle"></span><span
@@ -101,7 +103,7 @@ const AdminLayout = () => {
                             aria-hidden="true"></i></a>
 
                         <div class="sidebar-user" >
-                            <img class="img-60" src={`https://localhost:7285/Images/${user.avatar}`} alt="#" />
+                            <img class="img-60" src={`https://192.168.243.125:7285/Images/${user.avatar}`} alt="#" />
                             <div>
                                 <h6 class="f-14">{user.lastName}</h6>
                                 <p>{role}</p>
@@ -127,7 +129,7 @@ const AdminLayout = () => {
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                         <path fill="#fff" d="M16.97,10.79C18.64,10.80,19.99,12.17,20,13.88L20,13.88L20,16.90C19.99,18.61,18.64,19.99,16.97,20L16.97,20L14.00,20C12.33,20.00,10.98,18.61,10.98,16.90L10.98,16.90L10.98,13.88C10.98,12.17,12.33,10.79,14.00,10.79L14.00,10.79ZM4.25,10.79C4.56,10.76,4.86,10.91,5.03,11.18C5.20,11.45,5.20,11.79,5.03,12.06C4.86,12.33,4.56,12.48,4.25,12.45L4.25,12.45L3.03,12.45C2.26,12.45,1.63,13.09,1.62,13.88L1.62,13.88L1.62,16.86C1.64,17.65,2.27,18.28,3.03,18.29L3.03,18.29L6.01,18.29C6.39,18.30,6.75,18.15,7.01,17.88C7.28,17.61,7.42,17.25,7.42,16.86L7.42,16.86L7.42,12.38L7.41,12.27C7.40,11.97,7.54,11.69,7.79,11.53C8.07,11.35,8.43,11.36,8.70,11.55C8.98,11.75,9.10,12.10,9.02,12.43L9.02,12.43L9.02,16.89C9.02,18.60,7.66,20.00,5.99,20.00L5.99,20.00L3.03,20.00C1.37,19.96,0.03,18.59,0.00,16.89L0.00,16.89L0.00,13.88C0.00,13.06,0.32,12.27,0.89,11.69C1.46,11.11,2.23,10.79,3.03,10.79L3.03,10.79ZM16.97,12.45L14.00,12.45C13.23,12.45,12.60,13.09,12.60,13.88L12.60,13.88L12.60,16.90C12.60,17.28,12.75,17.65,13.01,17.92C13.27,18.19,13.63,18.34,14.00,18.33L14.00,18.33L16.97,18.33C17.34,18.34,17.70,18.19,17.96,17.92C18.22,17.65,18.37,17.28,18.37,16.90L18.37,16.90L18.37,13.88C18.37,13.50,18.22,13.14,17.96,12.87C17.69,12.60,17.34,12.45,16.97,12.45L16.97,12.45ZM16.97,0.00C18.62,0.04,19.96,1.41,20.00,3.10L20.00,3.10L20.00,6.11C20.00,6.93,19.69,7.72,19.13,8.31C18.57,8.89,17.80,9.23,17.00,9.24L17.00,9.24L15.78,9.24C15.36,9.19,15.05,8.83,15.05,8.41C15.05,7.98,15.36,7.62,15.78,7.58L15.78,7.58L16.97,7.58C17.34,7.58,17.70,7.42,17.96,7.15C18.23,6.87,18.37,6.50,18.37,6.12L18.37,6.12L18.37,3.10C18.36,2.31,17.73,1.67,16.97,1.67L16.97,1.67L14.00,1.67C13.23,1.67,12.60,2.31,12.60,3.10L12.60,3.10L12.60,7.62L12.59,7.72C12.53,8.13,12.18,8.44,11.77,8.43C11.55,8.43,11.35,8.33,11.20,8.17C11.05,8.01,10.97,7.80,10.98,7.58L10.98,7.58L10.98,3.10C10.98,2.28,11.29,1.49,11.86,0.91C12.43,0.33,13.20,0.00,14.00,0.00L14.00,0.00ZM5.99,0.00C7.67,0.01,9.03,1.39,9.03,3.10L9.03,3.10L9.03,6.12C9.03,6.94,8.71,7.73,8.14,8.31C7.57,8.89,6.80,9.21,5.99,9.21L5.99,9.21L3.03,9.21C1.36,9.20,0.01,7.83,0.00,6.12L0.00,6.12L0.00,3.10C0.01,1.39,1.36,0.01,3.03,0.00L3.03,0.00ZM5.99,1.67L3.03,1.67C2.66,1.66,2.29,1.81,2.03,2.08C1.76,2.35,1.61,2.71,1.61,3.10L1.61,3.10L1.61,6.12C1.60,6.51,1.75,6.89,2.02,7.16C2.29,7.44,2.65,7.59,3.03,7.58L3.03,7.58L5.99,7.58C6.37,7.58,6.73,7.42,6.99,7.15C7.26,6.87,7.40,6.50,7.40,6.12L7.40,6.12L7.40,3.10C7.39,2.31,6.77,1.67,5.99,1.67L5.99,1.67Z" />
                                     </svg>
-                                    <span>Loại sản phẩm</span>
+                                    <span>Danh mục sản phẩm</span>
                                 </NavLink>
                             </li>
                             <li>
@@ -149,14 +151,14 @@ const AdminLayout = () => {
                                     <span>Hóa đơn</span>
                                 </NavLink>
                             </li>
-
-                            <li>
-                                <NavLink to="/UserList" className="sidebar-header" >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                                    <span>Tài khoản</span>
-                                </NavLink>
-                            </li>
-
+                            {
+                                isEmployee ? '' : (<li>
+                                    <NavLink to="/UserList" className="sidebar-header" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                                        <span>Tài khoản</span>
+                                    </NavLink>
+                                </li>)
+                            }
                             <li>
                                 <NavLink to="/HomeReport" className="sidebar-header" href="reports.html">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>

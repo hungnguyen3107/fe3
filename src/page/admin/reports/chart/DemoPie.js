@@ -6,13 +6,17 @@ const DemoPie = () => {
     const [valueStatusTwo, setvalueStatusTwo] = useState();
     const [valueStatusThree, setvalueStatusThree] = useState();
     const [valueStatusFour, setvalueStatusFour] = useState();
+    const [valueStatusFive, setvalueStatusFive] = useState();
+    const [valueStatusSix, setvalueStatusSix] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerpage] = useState(8);
     const data = [
         { type: 'Chờ xác nhận', value: valueStatusOne },
         { type: 'Đang giao hàng', value: valueStatusTwo },
         { type: 'Đã giao hàng', value: valueStatusThree },
-        { type: 'Đã hủy hàng', value: valueStatusFour }
+        { type: 'Đã hủy hàng', value: valueStatusFour },
+        { type: 'Đã hoàn trả một phần', value: valueStatusFive },
+        { type: 'Đã hoàn trả toàn bộ', value: valueStatusSix },
     ];
     //lấy dữ liệu đơn hàng chờ xác nhận 
     const getOrderStatusOne = async () => {
@@ -74,12 +78,44 @@ const DemoPie = () => {
             console.error(error);
         }
     }
+    //lấy dữ liệu trả một phần đơn hàng
+    const getOrderStatusFive = async () => {
+        try {
+            const res = await orderServices.get(
+                {
+                    "Limit": currentPage,
+                    "PageIndex": rowsPerPage,
+                    "Status": 5
+                }
+            );
+            setvalueStatusFive(res.totalCount);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    //lấy dữ liệu trả toàn bộ đơn hàng
+    const getOrderStatusSix = async () => {
+        try {
+            const res = await orderServices.get(
+                {
+                    "Limit": currentPage,
+                    "PageIndex": rowsPerPage,
+                    "Status": 6
+                }
+            );
+            setvalueStatusSix(res.totalCount);
+        } catch (error) {
+            console.error(error);
+        }
+    }
     useEffect(() => {
         getOrderStatusOne();
         getOrderStatusTwo();
         getOrderStatusThree();
         getOrderStatusFour();
-    }, [valueStatusOne, valueStatusTwo, valueStatusThree, valueStatusFour])
+        getOrderStatusFive();
+        getOrderStatusSix();
+    }, [valueStatusOne, valueStatusTwo, valueStatusThree, valueStatusFour, valueStatusFive, valueStatusSix])
     return (
         <Pie
             data={data}
