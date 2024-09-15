@@ -15,7 +15,7 @@ export const SearchResultsList = ({ results, setResults, handleClick }) => {
                     >
                         <Skeleton avatar title={false} loading={item.loading} active>
                             <List.Item.Meta
-                                avatar={<Avatar src={`https://192.168.243.125:7285/Images/${item.image[0]}`} style={{ borderRadius: "5px" }} />}
+                                avatar={<Avatar src={`https://localhost:7285/Images/${item.image[0]}`} style={{ borderRadius: "5px" }} />}
                                 title={<a onClick={() => handleClick(item.id)}>{item.name}</a>}
 
                             />

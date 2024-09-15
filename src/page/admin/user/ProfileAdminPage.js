@@ -37,7 +37,7 @@ const ProfileAdminPage = () => {
                         <div className="card">
                             <div className="card-body" style={{ fontSize: "14px" }}>
                                 <div className="profile-details text-center">
-                                    <img src={`https://192.168.243.125:7285/Images/${dataUser.avatar}`} alt=""
+                                    <img src={`https://localhost:7285/Images/${dataUser.avatar}`} alt=""
                                         className="img-fluid img-90 rounded-circle blur-up lazyloaded" />
                                     <h5 className="f-w-600 mb-0">{dataUser.firstName} {dataUser.lastName}</h5>
                                     <span>{dataUser.email}</span>

@@ -73,7 +73,7 @@ const CartPage = () => {
                                                 <td class="product-thumbnail">
                                                     <figure>
                                                         <a href="product-simple.html">
-                                                            <img src={`https://192.168.243.125:7285/Images/${items.productId[0].image[0]}`} width="100" height="100" alt="product" />
+                                                            <img src={`https://localhost:7285/Images/${items.productId[0].image[0]}`} width="100" height="100" alt="product" />
                                                         </a>
                                                     </figure>
                                                 </td>

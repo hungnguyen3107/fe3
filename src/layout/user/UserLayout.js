@@ -159,7 +159,7 @@ const UserLayout = () => {
                                             user ? (<>
                                                 <a class="wishlist-toggle" title="wishlist" onClick={handleClickUser}>
                                                     {
-                                                        user.avatar ? (<><img src={`https://192.168.243.125:7285/Images/${user.avatar}`} width={28} height={28} /></>) : (<><img src={icon} width={28} height={28} /></>)
+                                                        user.avatar ? (<><img src={`https://localhost:7285/Images/${user.avatar}`} width={28} height={28} /></>) : (<><img src={icon} width={28} height={28} /></>)
                                                     }
 
                                                 </a>
@@ -250,7 +250,7 @@ const UserLayout = () => {
                                                     <div class="product product-cart" key={index}>
                                                         <figure class="product-media">
                                                             <a >
-                                                                <img src={`https://192.168.243.125:7285/Images/${items.productId[0].image[0]}`} alt="product" width="80" height="88" />
+                                                                <img src={`https://localhost:7285/Images/${items.productId[0].image[0]}`} alt="product" width="80" height="88" />
                                                             </a>
                                                             <button class="btn btn-link btn-close" onClick={() => handleRemoveItem(items.productId[0].id)}>
                                                                 <i class="fas fa-times"></i><span class="sr-only">Close</span>

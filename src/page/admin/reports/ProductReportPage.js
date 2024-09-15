@@ -77,7 +77,7 @@ const ProductReportPage = () => {
                                                     reportProduct.map((items, index) => (
                                                         <tr key={index}>
                                                             <td data-field="Image">
-                                                                <img src={`https://192.168.243.125:7285/Images/${items.product.image[0]}`}
+                                                                <img src={`https://localhost:7285/Images/${items.product.image[0]}`}
                                                                     data-field="image" alt="" />
                                                             </td>
                                                             <td data-field="name">

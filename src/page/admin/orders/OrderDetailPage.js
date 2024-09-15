@@ -119,7 +119,7 @@ const OrderDetailPage = () => {
 
                                                                     <td>
                                                                         <a href="javascript:void(0)">
-                                                                            <img src={`https://192.168.243.125:7285/Images/${items.orderItems.image[0]}`} className="img-fluid  lazyload" alt="" />
+                                                                            <img src={`https://localhost:7285/Images/${items.orderItems.image[0]}`} className="img-fluid  lazyload" alt="" />
                                                                         </a>
                                                                     </td>
                                                                     <td>

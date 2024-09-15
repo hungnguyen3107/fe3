@@ -122,7 +122,7 @@ const HistoryOrderPage = () => {
                             <div class="product product-cart" key={index}>
                                 <figure class="product-media">
                                     <a >
-                                        <img src={`https://192.168.243.125:7285/Images/${items.orderItems.image[0]}`} alt="product" width="80" height="88" />
+                                        <img src={`https://localhost:7285/Images/${items.orderItems.image[0]}`} alt="product" width="80" height="88" />
                                     </a>
                                 </figure>
                                 <div class="product-detail">
