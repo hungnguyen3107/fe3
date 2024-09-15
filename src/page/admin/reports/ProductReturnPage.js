@@ -100,7 +100,7 @@ const ProductReturnPage = () => {
                                                                 {items.email}
                                                             </td>
                                                             <td data-field="image-url">
-                                                                <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="" />
+                                                                <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="" />
                                                             </td>
                                                             <td data-field="name">
                                                                 {items.name}

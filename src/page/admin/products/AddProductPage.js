@@ -84,7 +84,7 @@ const AddProductPage = () => {
     useEffect(() => {
         if (id && dataProductDetail.length > 0 && dataProductDetail[0].image) {
             const newFileList = dataProductDetail[0].image.map((imageName, index) => {
-                const imageUrl = `https://localhost:7285/Images/${imageName}`;
+                const imageUrl = `https://192.168.243.125:7285/Images/${imageName}`;
                 return {
                     uid: `${index + 1}`, // Một giá trị unique identifier cho mỗi ảnh
                     name: imageName, // Tên của ảnh, lấy trực tiếp từ mảng ảnh

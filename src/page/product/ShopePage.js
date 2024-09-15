@@ -225,7 +225,7 @@ const ShopePage = () => {
                                             <div class="product text-center" >
                                                 <figure class="product-media">
                                                     <a >
-                                                        <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
+                                                        <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" />
                                                     </a>
                                                     <div class="product-label-group">
                                                         <label class="product-label label-new">new</label>

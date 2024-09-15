@@ -111,7 +111,7 @@ const ReturnsModal = ({ getDetailOrder }) => {
             title: 'Ảnh',
             dataIndex: 'orderItems',
             render: (orderItems) => (
-                <img src={`https://localhost:7285/Images/${orderItems.image[0]}`} alt="product" style={{ width: 50, height: 50 }} />
+                <img src={`https://192.168.243.125:7285/Images/${orderItems.image[0]}`} alt="product" style={{ width: 50, height: 50 }} />
             ),
         },
         {

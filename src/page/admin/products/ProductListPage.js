@@ -134,7 +134,7 @@ const ProductListPage = () => {
                                                     }}>
                                                         <td>{index + 1}</td>
                                                         <td>
-                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`}
+                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`}
                                                                 data-field="image" alt="" />
                                                         </td>
 

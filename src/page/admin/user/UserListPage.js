@@ -116,7 +116,7 @@ const UserListPage = () => {
                                             }}>
 
                                                 <td>
-                                                    <img src={`https://localhost:7285/Images/${items.avatar}`} alt="" />
+                                                    <img src={`https://192.168.243.125:7285/Images/${items.avatar}`} alt="" />
                                                 </td>
 
                                                 <td>{items.firstName}</td>

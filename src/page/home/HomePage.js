@@ -143,7 +143,7 @@ const HomePage = () => {
                                                                 <div class="product product-list-sm" key={index}>
                                                                     <figure class="product-media">
                                                                         <a style={{ cursor: "pointer" }}>
-                                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
                                                                         </a>
                                                                     </figure>
                                                                     <div class="product-details">
@@ -268,7 +268,7 @@ const HomePage = () => {
                                                     <div class="product text-center">
                                                         <figure class="product-media">
                                                             <a style={{ cursor: "pointer" }}>
-                                                                <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
                                                             </a>
                                                             <div class="product-label-group">
                                                                 <label class="product-label label-new">new</label>
@@ -348,7 +348,7 @@ const HomePage = () => {
                                                             <div class="product product-list-sm" key={index}>
                                                                 <figure class="product-media">
                                                                     <a href="demo3-product.html">
-                                                                        <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                        <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
                                                                     </a>
                                                                 </figure>
                                                                 <div class="product-details">
@@ -452,7 +452,7 @@ const HomePage = () => {
                                                         <div class="product product-list-sm" key={index}>
                                                             <figure class="product-media">
                                                                 <a href="demo3-product.html">
-                                                                    <img src={`https://localhost:7285/Images/${items.product.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
+                                                                    <img src={`https://192.168.243.125:7285/Images/${items.product.image[0]}`} alt="product" width="100" height="100" style={{ backgroundColor: "#f5f5f5" }} />
                                                                 </a>
                                                             </figure>
                                                             <div class="product-details">

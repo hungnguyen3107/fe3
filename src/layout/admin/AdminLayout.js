@@ -70,7 +70,7 @@ const AdminLayout = () => {
                                     <Popover placement="bottom" content={content}>
                                         <img
                                             class="align-self-center pull-right img-50 blur-up lazyloaded"
-                                            src={`https://localhost:7285/Images/${user.avatar}`} alt="header-user" style={{ width: "50px" }} />
+                                            src={`https://192.168.243.125:7285/Images/${user.avatar}`} alt="header-user" style={{ width: "50px" }} />
                                     </Popover>
 
                                     <div class="dotted-animation"><span class="animate-circle"></span><span
@@ -103,7 +103,7 @@ const AdminLayout = () => {
                             aria-hidden="true"></i></a>
 
                         <div class="sidebar-user" >
-                            <img class="img-60" src={`https://localhost:7285/Images/${user.avatar}`} alt="#" />
+                            <img class="img-60" src={`https://192.168.243.125:7285/Images/${user.avatar}`} alt="#" />
                             <div>
                                 <h6 class="f-14">{user.lastName}</h6>
                                 <p>{role}</p>

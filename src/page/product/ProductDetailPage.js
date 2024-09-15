@@ -78,7 +78,7 @@ const ProductDetailPage = () => {
             if (res) {
                 setProductId(res.items);
                 setData({
-                    image: `https://localhost:7285/Images/${res.items[0].image[0]}`,
+                    image: `https://192.168.243.125:7285/Images/${res.items[0].image[0]}`,
                     index: 0
                 })
                 setIdCategory(res.items[0].category.id);
@@ -281,9 +281,9 @@ scroll-behavior: smooth;
                                     {productId.map((item, index) => (
                                         <div class="product-thumbs" key={index} style={{ border: data.image === item.image ? '1px solid blue' : '' }}>
                                             {item.image.map((imageItem, imageIndex) => (
-                                                <div key={imageIndex} onClick={() => setData({ image: `https://localhost:7285/Images/${imageItem}`, index: imageIndex })}>
+                                                <div key={imageIndex} onClick={() => setData({ image: `https://192.168.243.125:7285/Images/${imageItem}`, index: imageIndex })}>
                                                     <div class="product-thumb">
-                                                        <img src={`https://localhost:7285/Images/${imageItem}`} alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
+                                                        <img src={`https://192.168.243.125:7285/Images/${imageItem}`} alt="product thumbnail" width="137" height="154" style={{ backgroundColor: "#f5f5f5" }} />
                                                     </div>
                                                 </div>
                                             ))}
@@ -518,7 +518,7 @@ scroll-behavior: smooth;
                                                                                 </a>
                                                                             </>) : (<>
                                                                                 <a >
-                                                                                    <img src={`https://localhost:7285/Images/${items.user.avatar}`} alt="avatar" />
+                                                                                    <img src={`https://192.168.243.125:7285/Images/${items.user.avatar}`} alt="avatar" />
                                                                                 </a>
                                                                             </>)
                                                                         }
@@ -657,7 +657,7 @@ scroll-behavior: smooth;
                                                 <div class="product text-center" key={index} ref={productSimilarRef} onClick={() => handleClickDetail(items.id)}>
                                                     <figure class="product-media">
                                                         <a style={{ cursor: "pointer" }}>
-                                                            <img src={`https://localhost:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
+                                                            <img src={`https://192.168.243.125:7285/Images/${items.image[0]}`} alt="product" width="280" height="315" style={{ backgroundColor: "#f5f5f5" }} />
                                                         </a>
                                                         <div class="product-label-group">
                                                             <label class="product-label label-new">new</label>
